@@ -538,7 +538,7 @@
      ═══════════════════════════════════════════════════════════════════════════ */
   .rocket {
     position: fixed;
-    z-index: 50;
+    z-index: 0;
     pointer-events: none;
     width: 64px; height: 64px;
     left: -80px; bottom: -80px;
@@ -943,7 +943,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const vw = window.innerWidth, vh = window.innerHeight;
       const x = -80 + (vw + 160) * p;
       const y = vh + 40 - (vh + 160) * p - Math.sin(p * 3.14159) * 80;
-      const tilt = -35 + p * 10 + Math.sin(p * 8) * 3;
+      const tilt = 55 + p * 10 + Math.sin(p * 8) * 3;
       const fade = p < 0.1 ? p * 10 : p > 0.85 ? (1 - p) / 0.15 : 1;
       const sc = 0.8 + Math.sin(p * 3.14159) * 0.4;
       if (!rocket.classList.contains('flying')) rocket.classList.add('flying');
