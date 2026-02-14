@@ -65,6 +65,47 @@
     background-size: 256px;
   }
 
+  /* Starfield layers (3 depth planes for parallax) */
+  .stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    will-change: transform;
+  }
+  .stars-1, .stars-2, .stars-3 {
+    position: absolute; inset: -60px;
+    background-repeat: repeat;
+  }
+  .stars-1 {
+    background-image:
+      radial-gradient(1px 1px at 50px 120px, rgba(255,255,255,.7), transparent),
+      radial-gradient(1px 1px at 180px 300px, rgba(255,255,255,.5), transparent),
+      radial-gradient(1px 1px at 340px 80px, rgba(255,255,255,.6), transparent),
+      radial-gradient(1px 1px at 470px 250px, rgba(255,255,255,.4), transparent),
+      radial-gradient(1px 1px at 620px 420px, rgba(255,255,255,.55), transparent),
+      radial-gradient(1px 1px at 90px 480px, rgba(255,255,255,.5), transparent),
+      radial-gradient(1px 1px at 750px 160px, rgba(255,255,255,.65), transparent),
+      radial-gradient(1px 1px at 400px 530px, rgba(255,255,255,.4), transparent);
+    background-size: 800px 600px;
+  }
+  .stars-2 {
+    background-image:
+      radial-gradient(1.5px 1.5px at 120px 200px, rgba(200,210,255,.6), transparent),
+      radial-gradient(1.2px 1.2px at 350px 50px, rgba(255,220,200,.5), transparent),
+      radial-gradient(1.5px 1.5px at 500px 380px, rgba(200,255,230,.55), transparent),
+      radial-gradient(1.3px 1.3px at 680px 120px, rgba(255,200,255,.45), transparent),
+      radial-gradient(1.5px 1.5px at 220px 450px, rgba(200,220,255,.5), transparent),
+      radial-gradient(1.2px 1.2px at 800px 320px, rgba(255,255,200,.4), transparent);
+    background-size: 900px 550px;
+  }
+  .stars-3 {
+    background-image:
+      radial-gradient(2px 2px at 200px 100px, rgba(108,99,255,.5), transparent),
+      radial-gradient(2px 2px at 550px 300px, rgba(0,212,170,.4), transparent),
+      radial-gradient(1.8px 1.8px at 100px 350px, rgba(255,255,255,.5), transparent),
+      radial-gradient(2px 2px at 700px 180px, rgba(255,107,107,.35), transparent),
+      radial-gradient(2.2px 2.2px at 400px 480px, rgba(79,195,247,.4), transparent);
+    background-size: 1000px 550px;
+  }
+
   /* Floating orbs */
   .orb {
     position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
@@ -495,6 +536,11 @@
 </head>
 <body>
 <div class="grain"></div>
+<div class="stars">
+  <div class="stars-1"></div>
+  <div class="stars-2"></div>
+  <div class="stars-3"></div>
+</div>
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
@@ -783,14 +829,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   els.forEach(el => observer.observe(el));
 
-  // Parallax orbs on mouse move
+  // Parallax orbs + stars on mouse move
   const orbs = document.querySelectorAll('.orb');
+  const starLayers = document.querySelectorAll('.stars-1,.stars-2,.stars-3');
   document.addEventListener('mousemove', (e) => {
     const x = (e.clientX / window.innerWidth - 0.5) * 2;
     const y = (e.clientY / window.innerHeight - 0.5) * 2;
     orbs.forEach((orb, i) => {
       const speed = (i + 1) * 8;
       orb.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+    });
+    starLayers.forEach((layer, i) => {
+      const depth = (i + 1) * 6;
+      layer.style.transform = `translate(${x * depth}px, ${y * depth}px)`;
     });
   });
 });
