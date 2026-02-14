@@ -867,15 +867,15 @@ document.addEventListener('DOMContentLoaded', () => {
     smoothVel += (scrollVel - smoothVel) * attack;
     scrollVel *= 0.92; // decay when not scrolling
 
-    // Warp factor: 0 = idle, up to ~20 at fast scroll
-    const warp = Math.min(smoothVel * 12, 20);
+    // Warp factor: 0 = idle, capped for smooth visual
+    const warp = Math.min(smoothVel * 8, 12);
 
     starLayers.forEach((layer, i) => {
       const depth = (i + 1);
       const px = mouseX * depth * 6;
       const py = mouseY * depth * 6;
-      const stretch = 1 + warp * depth * 0.5;
-      const brightness = 1 + warp * 0.08;
+      const stretch = 1 + warp * depth * 0.35;
+      const brightness = 1 + warp * 0.06;
       layer.style.transform = `translate(${px}px, ${py}px) scaleY(${stretch})`;
       layer.style.opacity = Math.min(1, brightness);
     });
