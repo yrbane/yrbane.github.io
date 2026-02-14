@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>yrbane &mdash; Projects</title>
+<style>
+  /* ═══════════════════════════════════════════════════════════════════════════
+     RESET & BASE
+     ═══════════════════════════════════════════════════════════════════════════ */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:        #06060b;
+    --bg-card:   #0e0e18;
+    --bg-code:   #14142a;
+    --border:    #1a1a30;
+    --text:      #c4c4d8;
+    --text-dim:  #5a5a72;
+    --accent:    #6c63ff;
+    --accent2:   #00d4aa;
+    --accent3:   #ff6b6b;
+    --accent4:   #ffd93d;
+    --accent5:   #4fc3f7;
+    --glow:      rgba(108, 99, 255, .15);
+    --radius:    14px;
+    --radius-sm: 10px;
+    --font:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono:      'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--accent); color: #fff; }
+
+  a { color: var(--accent); text-decoration: none; transition: color .2s; }
+  a:hover { color: #fff; }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     AMBIENT
+     ═══════════════════════════════════════════════════════════════════════════ */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 25% 10%, rgba(108,99,255,.07), transparent),
+      radial-gradient(ellipse 60% 50% at 75% 85%, rgba(0,212,170,.05), transparent),
+      radial-gradient(ellipse 40% 30% at 50% 50%, rgba(255,107,107,.03), transparent);
+    pointer-events: none; z-index: 0;
+  }
+
+  .grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: .02;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 256px;
+  }
+
+  /* Floating orbs */
+  .orb {
+    position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+    filter: blur(80px); opacity: .35;
+    animation: orbFloat 20s ease-in-out infinite alternate;
+  }
+  .orb-1 { width: 400px; height: 400px; top: -100px; left: -100px; background: rgba(108,99,255,.15); }
+  .orb-2 { width: 350px; height: 350px; bottom: -80px; right: -80px; background: rgba(0,212,170,.12); animation-delay: -7s; animation-duration: 25s; }
+  .orb-3 { width: 250px; height: 250px; top: 40%; left: 60%; background: rgba(255,107,107,.08); animation-delay: -14s; animation-duration: 30s; }
+  @keyframes orbFloat {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(30px, -40px) scale(1.1); }
+    66%  { transform: translate(-20px, 30px) scale(.95); }
+    100% { transform: translate(15px, -15px) scale(1.05); }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     LAYOUT
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .container {
+    position: relative; z-index: 1;
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  section { padding: 80px 0; }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     NAV
+     ═══════════════════════════════════════════════════════════════════════════ */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(24px) saturate(1.6);
+    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    background: rgba(6,6,11,.6);
+    border-bottom: 1px solid rgba(26,26,48,.6);
+  }
+  nav .container {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 16px; padding-bottom: 16px;
+  }
+  .nav-logo {
+    font-family: var(--mono); font-weight: 800; font-size: 1.2rem;
+    color: #fff; text-decoration: none; letter-spacing: -.03em;
+  }
+  .nav-logo span { color: var(--accent); }
+  nav ul { list-style: none; display: flex; gap: 32px; }
+  nav a {
+    color: var(--text-dim); font-size: .88rem;
+    font-weight: 500; transition: color .2s;
+  }
+  nav a:hover { color: #fff; }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .hero {
+    padding: 140px 0 100px;
+    text-align: center;
+    position: relative;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 50%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  .hero-avatar {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 3px solid var(--border);
+    margin: 0 auto 28px;
+    display: block;
+    box-shadow: 0 0 40px rgba(108,99,255,.2);
+    transition: border-color .3s, box-shadow .3s;
+  }
+  .hero-avatar:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 60px rgba(108,99,255,.4);
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--glow);
+    border: 1px solid rgba(108,99,255,.2);
+    border-radius: 999px;
+    padding: 6px 18px;
+    font-size: .78rem; font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 28px;
+  }
+  .hero-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent2);
+    box-shadow: 0 0 8px var(--accent2);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .4; transform: scale(.7); }
+  }
+
+  .hero h1 {
+    font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+    font-weight: 900;
+    letter-spacing: -.04em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent5));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero .sub {
+    font-size: 1.15rem;
+    color: var(--text-dim);
+    max-width: 580px;
+    margin: 0 auto 40px;
+    font-weight: 400;
+  }
+
+  .hero-stats {
+    display: flex; justify-content: center; gap: 48px;
+    flex-wrap: wrap;
+  }
+  .hero-stat { text-align: center; }
+  .hero-stat .num {
+    font-size: 2rem; font-weight: 800; color: #fff;
+    font-family: var(--mono);
+  }
+  .hero-stat .label {
+    font-size: .76rem; color: var(--text-dim); font-weight: 500;
+    margin-top: 2px; text-transform: uppercase; letter-spacing: .06em;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     SECTION TITLES
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .section-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono);
+    font-size: .76rem; font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    margin-bottom: 12px;
+  }
+  .section-tag::before {
+    content: '';
+    width: 20px; height: 2px;
+    background: var(--accent);
+    border-radius: 1px;
+  }
+
+  .section-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+  .section-desc {
+    color: var(--text-dim);
+    max-width: 600px;
+    font-size: 1rem;
+    margin-bottom: 52px;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     FEATURED PROJECTS
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .featured-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .4s, transform .4s, box-shadow .4s;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+  }
+  .featured-card:hover {
+    border-color: rgba(108,99,255,.35);
+    transform: translateY(-4px);
+    box-shadow:
+      0 20px 60px rgba(0,0,0,.4),
+      0 0 0 1px rgba(108,99,255,.15),
+      inset 0 1px 0 rgba(255,255,255,.03);
+    color: inherit;
+  }
+  .featured-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    opacity: 0;
+    transition: opacity .4s;
+  }
+  .featured-card:hover::before { opacity: 1; }
+  .featured-card.fc-purple::before { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .featured-card.fc-cyan::before   { background: linear-gradient(90deg, var(--accent5), var(--accent2)); }
+  .featured-card.fc-red::before    { background: linear-gradient(90deg, var(--accent3), var(--accent4)); }
+  .featured-card.fc-green::before  { background: linear-gradient(90deg, var(--accent2), var(--accent5)); }
+
+  .fc-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .fc-icon {
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 12px;
+    font-size: 1.4rem;
+  }
+  .fc-icon.fci-purple { background: rgba(108,99,255,.12); color: var(--accent); }
+  .fc-icon.fci-cyan   { background: rgba(79,195,247,.12);  color: var(--accent5); }
+  .fc-icon.fci-red    { background: rgba(255,107,107,.12); color: var(--accent3); }
+  .fc-icon.fci-green  { background: rgba(0,212,170,.12);   color: var(--accent2); }
+
+  .fc-lang {
+    font-family: var(--mono);
+    font-size: .72rem; font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .fc-lang .lang-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .lang-rust .lang-dot  { background: #dea584; }
+  .lang-rust            { background: rgba(222,165,132,.1); color: #dea584; }
+  .lang-ts .lang-dot    { background: #3178c6; }
+  .lang-ts              { background: rgba(49,120,198,.1); color: #3178c6; }
+  .lang-php .lang-dot   { background: #777bb4; }
+  .lang-php             { background: rgba(119,123,180,.1); color: #777bb4; }
+  .lang-kt .lang-dot    { background: #A97BFF; }
+  .lang-kt              { background: rgba(169,123,255,.1); color: #A97BFF; }
+  .lang-sh .lang-dot    { background: #89e051; }
+  .lang-sh              { background: rgba(137,224,81,.1); color: #89e051; }
+  .lang-css .lang-dot   { background: #563d7c; }
+  .lang-css             { background: rgba(86,61,124,.1); color: #a78bfa; }
+
+  .fc-title {
+    font-size: 1.25rem; font-weight: 800; color: #fff;
+    margin-bottom: 8px; letter-spacing: -.02em;
+  }
+  .fc-desc {
+    font-size: .88rem; color: var(--text-dim);
+    line-height: 1.6; margin-bottom: 20px;
+  }
+
+  .fc-tags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .fc-tag {
+    font-family: var(--mono);
+    font-size: .7rem; font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: rgba(108,99,255,.08);
+    color: var(--accent);
+    border: 1px solid rgba(108,99,255,.12);
+  }
+
+  .fc-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono);
+    font-size: .78rem; font-weight: 600;
+    color: var(--accent);
+    transition: color .2s, gap .2s;
+  }
+  .fc-link:hover { color: #fff; gap: 10px; }
+  .fc-link svg { transition: transform .2s; }
+  .fc-link:hover svg { transform: translateX(2px); }
+
+  .fc-bottom {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(26,26,48,.6);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     OTHER PROJECTS GRID
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .project-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 24px;
+    transition: border-color .3s, transform .3s;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+  }
+  .project-card:hover {
+    border-color: rgba(108,99,255,.25);
+    transform: translateY(-2px);
+    color: inherit;
+  }
+
+  .pc-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .pc-name {
+    font-family: var(--mono);
+    font-size: .9rem; font-weight: 700; color: var(--accent);
+  }
+  .pc-lang {
+    font-size: .65rem; font-weight: 600; font-family: var(--mono);
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .pc-desc {
+    font-size: .82rem; color: var(--text-dim);
+    line-height: 1.5; flex: 1;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     TECH STACK
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .tech-grid {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    justify-content: center;
+  }
+  .tech-badge {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 24px;
+    font-family: var(--mono);
+    font-size: .88rem; font-weight: 600;
+    color: #fff;
+    display: flex; align-items: center; gap: 10px;
+    transition: border-color .3s, box-shadow .3s, transform .3s;
+  }
+  .tech-badge:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 24px var(--glow);
+    transform: translateY(-2px);
+  }
+  .tech-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════════════════════════════════ */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 48px 0;
+    text-align: center;
+    font-size: .82rem;
+    color: var(--text-dim);
+  }
+  footer .heart { color: var(--accent3); }
+  .footer-links {
+    display: flex; justify-content: center; gap: 24px;
+    margin-top: 12px;
+  }
+  .footer-links a {
+    color: var(--text-dim); font-size: .82rem;
+    transition: color .2s;
+  }
+  .footer-links a:hover { color: #fff; }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     RESPONSIVE
+     ═══════════════════════════════════════════════════════════════════════════ */
+  @media (max-width: 900px) {
+    .featured-grid { grid-template-columns: 1fr; }
+    .projects-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .projects-grid { grid-template-columns: 1fr; }
+    nav ul { gap: 16px; }
+    .hero-stats { gap: 28px; }
+    .hero { padding: 100px 0 70px; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     ANIMATIONS
+     ═══════════════════════════════════════════════════════════════════════════ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-in {
+    opacity: 0;
+    animation: fadeUp .7s ease-out forwards;
+  }
+  .delay-1 { animation-delay: .1s; }
+  .delay-2 { animation-delay: .2s; }
+  .delay-3 { animation-delay: .3s; }
+  .delay-4 { animation-delay: .4s; }
+  .delay-5 { animation-delay: .5s; }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════════════
+     NAV
+     ═════════════════════════════════════════════════════════════════════════ -->
+<nav>
+  <div class="container">
+    <a href="#" class="nav-logo"><span>@</span>yrbane</a>
+    <ul>
+      <li><a href="#projects">Projets</a></li>
+      <li><a href="#more">Tous</a></li>
+      <li><a href="#stack">Stack</a></li>
+      <li><a href="https://github.com/yrbane">GitHub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═════════════════════════════════════════════════════════════════════════
+     HERO
+     ═════════════════════════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="container">
+    <img class="hero-avatar animate-in" src="https://avatars.githubusercontent.com/u/143083313?v=4" alt="yrbane">
+
+    <div class="hero-badge animate-in delay-1">
+      <span class="dot"></span>
+      Open Source &mdash; Rust &amp; Web
+    </div>
+
+    <h1 class="animate-in delay-2">
+      Building <span class="grad">fast tools</span><br>
+      &amp; beautiful things
+    </h1>
+
+    <p class="sub animate-in delay-3">
+      Developpeur passionnee par la performance, les outils CLI,
+      et les interfaces soignees. Rust, TypeScript, PHP, Kotlin.
+    </p>
+
+    <div class="hero-stats animate-in delay-4">
+      <div class="hero-stat">
+        <div class="num">23</div>
+        <div class="label">Repos</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">5</div>
+        <div class="label">Langages</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">267+</div>
+        <div class="label">Tests</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════════════════════════
+     FEATURED PROJECTS
+     ═════════════════════════════════════════════════════════════════════════ -->
+<section id="projects">
+  <div class="container">
+    <div class="section-tag">Projets phares</div>
+    <h2 class="section-title">Highlights</h2>
+    <p class="section-desc">
+      Outils CLI haute performance, applications web, et plus encore.
+    </p>
+
+    <div class="featured-grid">
+
+      <!-- cp -->
+      <a href="https://github.com/yrbane/cp" class="featured-card fc-purple">
+        <div class="fc-header">
+          <div class="fc-icon fci-purple">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+          </div>
+          <span class="fc-lang lang-rust"><span class="lang-dot"></span> Rust</span>
+        </div>
+        <div class="fc-title">cp</div>
+        <div class="fc-desc">Implementation moderne de GNU cp en Rust. Zero-copy I/O, copie parallele, sparse files, reflink, 30+ flags CLI, 137 tests.</div>
+        <div class="fc-tags">
+          <span class="fc-tag">zero-copy</span>
+          <span class="fc-tag">sendfile</span>
+          <span class="fc-tag">reflink</span>
+          <span class="fc-tag">parallel</span>
+        </div>
+        <div class="fc-bottom">
+          <span class="fc-link">Voir le projet <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </div>
+      </a>
+
+      <!-- photo-sort -->
+      <a href="https://github.com/yrbane/photo-sort" class="featured-card fc-cyan">
+        <div class="fc-header">
+          <div class="fc-icon fci-cyan">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <span class="fc-lang lang-rust"><span class="lang-dot"></span> Rust</span>
+        </div>
+        <div class="fc-title">photo-sort</div>
+        <div class="fc-desc">Tri automatique de photos par date EXIF, deduplication BLAKE3, galerie web avec lightbox, tags, notes, EXIF, mode serveur REST.</div>
+        <div class="fc-tags">
+          <span class="fc-tag">EXIF</span>
+          <span class="fc-tag">BLAKE3</span>
+          <span class="fc-tag">galerie</span>
+          <span class="fc-tag">14 formats</span>
+        </div>
+        <div class="fc-bottom">
+          <span class="fc-link">Voir le projet <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </div>
+      </a>
+
+      <!-- multishiva -->
+      <a href="https://github.com/yrbane/multishiva" class="featured-card fc-red">
+        <div class="fc-header">
+          <div class="fc-icon fci-red">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <span class="fc-lang lang-rust"><span class="lang-dot"></span> Rust</span>
+        </div>
+        <div class="fc-title">MultiShiva</div>
+        <div class="fc-desc">Un clavier, une souris, plusieurs ordinateurs. Partage KVM reseau en Rust pour Linux, macOS et Windows.</div>
+        <div class="fc-tags">
+          <span class="fc-tag">KVM</span>
+          <span class="fc-tag">cross-platform</span>
+          <span class="fc-tag">reseau</span>
+        </div>
+        <div class="fc-bottom">
+          <span class="fc-link">Voir le projet <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </div>
+      </a>
+
+      <!-- veilleur -->
+      <a href="https://github.com/yrbane/veilleur" class="featured-card fc-green">
+        <div class="fc-header">
+          <div class="fc-icon fci-green">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
+          <span class="fc-lang lang-ts"><span class="lang-dot"></span> TypeScript</span>
+        </div>
+        <div class="fc-title">Veilleur</div>
+        <div class="fc-desc">Agregateur d'actualites libre. Votre sentinelle de l'information, avec interface moderne en TypeScript.</div>
+        <div class="fc-tags">
+          <span class="fc-tag">news</span>
+          <span class="fc-tag">agregateur</span>
+          <span class="fc-tag">libre</span>
+        </div>
+        <div class="fc-bottom">
+          <span class="fc-link">Voir le projet <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════════════════════════
+     MORE PROJECTS
+     ═════════════════════════════════════════════════════════════════════════ -->
+<section id="more">
+  <div class="container">
+    <div class="section-tag">Autres projets</div>
+    <h2 class="section-title">Et aussi&hellip;</h2>
+    <p class="section-desc">
+      Plugins WordPress, frameworks PHP, outils sysadmin, et plus.
+    </p>
+
+    <div class="projects-grid">
+
+      <a href="https://github.com/yrbane/callfilter" class="project-card">
+        <div class="pc-header">
+          <span class="pc-name">callfilter</span>
+          <span class="pc-lang lang-kt"><span class="lang-dot"></span> Kotlin</span>
+        </div>
+        <div class="pc-desc">App Android de filtrage intelligent des appels entrants.</div>
+      </a>
+
+      <a href="https://github.com/yrbane/debian13-web-server" class="project-card">
+        <div class="pc-header">
+          <span class="pc-name">debian13-web-server</span>
+          <span class="pc-lang lang-sh"><span class="lang-dot"></span> Shell</span>
+        </div>
+        <div class="pc-desc">Installation et configuration securisee d'un serveur web Debian 13 en un clic.</div>
+      </a>
+
+      <a href="https://github.com/yrbane/lunar-aurora" class="project-card">
+        <div class="pc-header">
+          <span class="pc-name">lunar-aurora</span>
+          <span class="pc-lang lang-css"><span class="lang-dot"></span> CSS</span>
+        </div>
+        <div class="pc-desc">Framework CSS disruptif : OKLCH, @property, nesting, container queries, 8 themes.</div>
+      </a>
+
+      <a href="https://github.com/yrbane/micro-blog-static" class="project-card">
+        <div class="pc-header">
+          <span class="pc-name">micro-blog-static</span>
+          <span class="pc-lang lang-php"><span class="lang-dot"></span> PHP</span>
+        </div>
+        <div class="pc-desc">Micro-systeme de blog avec admin PHP generant des pages HTML statiques. Zero deps.</div>
+      </a>
+
+      <a href="https://github.com/yrbane/lunar-cli" class="project-card">
+        <div class="pc-header">
+          <span class="pc-name">lunar-cli</span>
+          <span class="pc-lang lang-php"><span class="lang-dot"></span> PHP</span>
+        </div>
+        <div class="pc-desc">Framework CLI PHP autonome avec commandes, helpers console et rendu de tableaux.</div>
+      </a>
+
+      <a href="https://github.com/yrbane/mystical-runic" class="project-card">
+        <div class="pc-header">
+          <span class="pc-name">mystical-runic</span>
+          <span class="pc-lang lang-rust"><span class="lang-dot"></span> Rust</span>
+        </div>
+        <div class="pc-desc">Ancient Symbols for Modern Web Magic. Polices runiques pour le web.</div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════════════════════════
+     TECH STACK
+     ═════════════════════════════════════════════════════════════════════════ -->
+<section id="stack">
+  <div class="container" style="text-align: center;">
+    <div class="section-tag" style="justify-content: center;">Stack</div>
+    <h2 class="section-title" style="text-align: center;">Technologies</h2>
+    <p class="section-desc" style="margin-left: auto; margin-right: auto; text-align: center;">
+      Les outils et langages que j'utilise au quotidien.
+    </p>
+
+    <div class="tech-grid">
+      <div class="tech-badge"><span class="tech-dot" style="background:#dea584"></span> Rust</div>
+      <div class="tech-badge"><span class="tech-dot" style="background:#3178c6"></span> TypeScript</div>
+      <div class="tech-badge"><span class="tech-dot" style="background:#777bb4"></span> PHP</div>
+      <div class="tech-badge"><span class="tech-dot" style="background:#A97BFF"></span> Kotlin</div>
+      <div class="tech-badge"><span class="tech-dot" style="background:#89e051"></span> Shell</div>
+      <div class="tech-badge"><span class="tech-dot" style="background:#563d7c"></span> CSS</div>
+      <div class="tech-badge"><span class="tech-dot" style="background:#f1502f"></span> Git</div>
+      <div class="tech-badge"><span class="tech-dot" style="background:#0db7ed"></span> Docker</div>
+      <div class="tech-badge"><span class="tech-dot" style="background:#d63aff"></span> Linux</div>
+      <div class="tech-badge"><span class="tech-dot" style="background:#ff9800"></span> Android</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <p>Made with <span class="heart">&hearts;</span> by <strong>yrbane</strong></p>
+    <div class="footer-links">
+      <a href="https://github.com/yrbane">GitHub</a>
+      <a href="https://yrbane.github.io/cp/">cp docs</a>
+      <a href="https://yrbane.github.io/photo-sort/">photo-sort docs</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ═════════════════════════════════════════════════════════════════════════
+     SCROLL ANIMATIONS
+     ═════════════════════════════════════════════════════════════════════════ -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const els = document.querySelectorAll(
+    '.featured-card, .project-card, .tech-badge'
+  );
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = `opacity .6s ease ${i * 50}ms, transform .6s ease ${i * 50}ms`;
+        requestAnimationFrame(() => {
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        });
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  els.forEach(el => observer.observe(el));
+
+  // Parallax orbs on mouse move
+  const orbs = document.querySelectorAll('.orb');
+  document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 2;
+    const y = (e.clientY / window.innerHeight - 0.5) * 2;
+    orbs.forEach((orb, i) => {
+      const speed = (i + 1) * 8;
+      orb.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+    });
+  });
+});
+</script>
+</body>
+</html>
