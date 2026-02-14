@@ -797,44 +797,30 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <!-- ═════════════════════════════════════════════════════════════════════════
-     WEBGL 3D GEOMETRY
+     3D GEOMETRY (Canvas 2D with manual projection)
      ═════════════════════════════════════════════════════════════════════════ -->
 <script>
 (function(){
   var c=document.getElementById('webgl-geo');
   if(!c)return;
-  var gl=c.getContext('webgl',{alpha:true,antialias:true,premultipliedAlpha:true});
-  if(!gl)return;
+  var ctx=c.getContext('2d');
+  if(!ctx)return;
 
   var DPR=1;
   function resize(){
     DPR=Math.min(window.devicePixelRatio||1,2);
     var w=c.clientWidth,h=c.clientHeight;
-    if(c.width!==w*DPR||c.height!==h*DPR){c.width=w*DPR;c.height=h*DPR;}
-    gl.viewport(0,0,c.width,c.height);
+    var nw=Math.round(w*DPR),nh=Math.round(h*DPR);
+    if(c.width!==nw||c.height!==nh){c.width=nw;c.height=nh;}
   }
   resize();
   window.addEventListener('resize',resize);
 
-  /* --- shaders --- */
-  var VS_L='attribute vec3 aP;uniform mat4 uM;void main(){gl_Position=uM*vec4(aP,1.);}';
-  var VS_P='attribute vec3 aP;uniform mat4 uM;uniform float uS;void main(){gl_Position=uM*vec4(aP,1.);gl_PointSize=uS;}';
-  var FS_L='precision mediump float;uniform vec4 uC;void main(){gl_FragColor=uC;}';
-  var FS_P='precision mediump float;uniform vec4 uC;void main(){float d=length(gl_PointCoord-.5)*2.;float a=1.-smoothstep(.0,1.,d);gl_FragColor=vec4(uC.rgb,uC.a*a);}';
-
-  function sh(s,t){var o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);return o;}
-  function pg(v,f){var p=gl.createProgram();gl.attachShader(p,sh(v,gl.VERTEX_SHADER));gl.attachShader(p,sh(f,gl.FRAGMENT_SHADER));gl.linkProgram(p);return p;}
-
-  var pL=pg(VS_L,FS_L),pP=pg(VS_P,FS_P);
-  var uML=gl.getUniformLocation(pL,'uM'),uCL=gl.getUniformLocation(pL,'uC');
-  var uMP=gl.getUniformLocation(pP,'uM'),uCP=gl.getUniformLocation(pP,'uC'),uSP=gl.getUniformLocation(pP,'uS');
-  var aL=gl.getAttribLocation(pL,'aP'),aP_=gl.getAttribLocation(pP,'aP');
-
   /* --- geometry --- */
   var phi=(1+Math.sqrt(5))/2;
-  var iV=[[-1,phi,0],[1,phi,0],[-1,-phi,0],[1,-phi,0],[0,-1,phi],[0,1,phi],[0,-1,-phi],[0,1,-phi],[phi,0,-1],[phi,0,1],[-phi,0,-1],[-phi,0,1]];
-  iV.forEach(function(v){var l=Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);v[0]/=l;v[1]/=l;v[2]/=l;});
-  var iF=[[0,11,5],[0,5,1],[0,1,7],[0,7,10],[0,10,11],[1,5,9],[5,11,4],[11,10,2],[10,7,6],[7,1,8],[3,9,4],[3,4,2],[3,2,6],[3,6,8],[3,8,9],[4,9,5],[2,4,11],[6,2,10],[8,6,7],[9,8,1]];
+  var icoV=[[-1,phi,0],[1,phi,0],[-1,-phi,0],[1,-phi,0],[0,-1,phi],[0,1,phi],[0,-1,-phi],[0,1,-phi],[phi,0,-1],[phi,0,1],[-phi,0,-1],[-phi,0,1]];
+  icoV.forEach(function(v){var l=Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);v[0]/=l;v[1]/=l;v[2]/=l;});
+  var icoF=[[0,11,5],[0,5,1],[0,1,7],[0,7,10],[0,10,11],[1,5,9],[5,11,4],[11,10,2],[10,7,6],[7,1,8],[3,9,4],[3,4,2],[3,2,6],[3,6,8],[3,8,9],[4,9,5],[2,4,11],[6,2,10],[8,6,7],[9,8,1]];
 
   function subdiv(V,F){
     var mc={},nV=V.map(function(v){return v.slice();}),nF=[];
@@ -843,37 +829,44 @@ document.addEventListener('DOMContentLoaded', () => {
     return{v:nV,f:nF};
   }
 
-  var s1=subdiv(iV,iF),s2=subdiv(s1.v,s1.f);
-
-  function edges(F){
+  function getEdges(F){
     var s={},e=[];
-    F.forEach(function(f){for(var i=0;i<3;i++){var a=f[i],b=f[(i+1)%3],k=Math.min(a,b)+'_'+Math.max(a,b);if(!s[k]){s[k]=1;e.push(a,b);}}});
+    F.forEach(function(f){for(var i=0;i<3;i++){var a=f[i],b=f[(i+1)%3],k=Math.min(a,b)+'_'+Math.max(a,b);if(!s[k]){s[k]=1;e.push([a,b]);}}});
     return e;
   }
 
-  var oV=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
-  var oF=[[0,2,4],[0,4,3],[0,3,5],[0,5,2],[1,2,5],[1,5,3],[1,3,4],[1,4,2]];
+  var s1=subdiv(icoV,icoF),s2=subdiv(s1.v,s1.f);
+  var octV=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+  var octF=[[0,2,4],[0,4,3],[0,3,5],[0,5,2],[1,2,5],[1,5,3],[1,3,4],[1,4,2]];
 
-  var gO={v:s2.v,e:edges(s2.f)};
-  var gM={v:iV,e:edges(iF)};
-  var gI={v:oV,e:edges(oF)};
+  var layers=[
+    {v:s2.v,e:getEdges(s2.f),sc:1.4,spd:[.5,.35,.2],mInf:.6,lw:0.8,la:.18,col:'108,99,255',pa:.4,pr:1.8},
+    {v:icoV,e:getEdges(icoF),sc:.75,spd:[-.8,-.55,-.35],mInf:.7,lw:1.5,la:.4,col:'0,212,170',pa:.7,pr:3},
+    {v:octV,e:getEdges(octF),sc:.4,spd:[1.3,.9,.7],mInf:.9,lw:2,la:.6,col:'255,107,107',pa:.85,pr:5}
+  ];
 
-  function flat(d){var r=[];d.forEach(function(a){r.push(a[0],a[1],a[2]);});return r;}
-  function mkV(d){var b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(flat(d)),gl.STATIC_DRAW);return b;}
-  function mkE(d){var b=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,b);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(d),gl.STATIC_DRAW);return b;}
-
-  var bOV=mkV(gO.v),bOE=mkE(gO.e);
-  var bMV=mkV(gM.v),bME=mkE(gM.e);
-  var bIV=mkV(gI.v),bIE=mkE(gI.e);
-
-  /* --- matrix math --- */
-  function m4(a,b){var o=new Float32Array(16);for(var i=0;i<4;i++)for(var j=0;j<4;j++)o[i*4+j]=a[i*4]*b[j]+a[i*4+1]*b[4+j]+a[i*4+2]*b[8+j]+a[i*4+3]*b[12+j];return o;}
-  function persp(f,a,n,fa){var t=1/Math.tan(f/2);return new Float32Array([t/a,0,0,0,0,t,0,0,0,0,(fa+n)/(n-fa),-1,0,0,2*fa*n/(n-fa),0]);}
-  function rX(a){var c=Math.cos(a),s=Math.sin(a);return new Float32Array([1,0,0,0,0,c,s,0,0,-s,c,0,0,0,0,1]);}
-  function rY(a){var c=Math.cos(a),s=Math.sin(a);return new Float32Array([c,0,-s,0,0,1,0,0,s,0,c,0,0,0,0,1]);}
-  function rZ(a){var c=Math.cos(a),s=Math.sin(a);return new Float32Array([c,s,0,0,-s,c,0,0,0,0,1,0,0,0,0,1]);}
-  function sc(s){return new Float32Array([s,0,0,0,0,s,0,0,0,0,s,0,0,0,0,1]);}
-  function tr(x,y,z){return new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,x,y,z,1]);}
+  /* --- 3D math --- */
+  function rotX(a){var c=Math.cos(a),s=Math.sin(a);return[1,0,0,0,c,s,0,-s,c];}
+  function rotY(a){var c=Math.cos(a),s=Math.sin(a);return[c,0,-s,0,1,0,s,0,c];}
+  function rotZ(a){var c=Math.cos(a),s=Math.sin(a);return[c,s,0,-s,c,0,0,0,1];}
+  function m3mul(a,b){
+    var o=new Array(9);
+    for(var i=0;i<3;i++)for(var j=0;j<3;j++)
+      o[i*3+j]=a[i*3]*b[j]+a[i*3+1]*b[3+j]+a[i*3+2]*b[6+j];
+    return o;
+  }
+  function transform(v,m,s){
+    return[
+      (m[0]*v[0]+m[1]*v[1]+m[2]*v[2])*s,
+      (m[3]*v[0]+m[4]*v[1]+m[5]*v[2])*s,
+      (m[6]*v[0]+m[7]*v[1]+m[8]*v[2])*s
+    ];
+  }
+  function project(v,w,h,fov){
+    var z=v[2]-3.5;
+    var f=fov/(-z);
+    return[w/2+v[0]*f,h/2-v[1]*f,z];
+  }
 
   /* --- mouse --- */
   var mx=0,my=0,smx=0,smy=0;
@@ -882,71 +875,60 @@ document.addEventListener('DOMContentLoaded', () => {
     my=(e.clientY/window.innerHeight-.5)*2;
   });
 
-  /* --- render --- */
-  gl.enable(gl.BLEND);
-  gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE,gl.ONE,gl.ONE);
-  gl.clearColor(0,0,0,0);
-  gl.lineWidth(Math.min(3,gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE)[1]));
-
-  function drawL(vb,eb,n,col,mvp){
-    gl.useProgram(pL);
-    gl.uniformMatrix4fv(uML,false,mvp);
-    gl.uniform4fv(uCL,col);
-    gl.bindBuffer(gl.ARRAY_BUFFER,vb);
-    gl.enableVertexAttribArray(aL);
-    gl.vertexAttribPointer(aL,3,gl.FLOAT,false,0,0);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,eb);
-    gl.drawElements(gl.LINES,n,gl.UNSIGNED_SHORT,0);
-  }
-
-  function drawP(vb,n,col,sz,mvp){
-    gl.useProgram(pP);
-    gl.uniformMatrix4fv(uMP,false,mvp);
-    gl.uniform4fv(uCP,col);
-    gl.uniform1f(uSP,sz*DPR);
-    gl.bindBuffer(gl.ARRAY_BUFFER,vb);
-    gl.enableVertexAttribArray(aP_);
-    gl.vertexAttribPointer(aP_,3,gl.FLOAT,false,0,0);
-    gl.drawArrays(gl.POINTS,0,n);
-  }
-
+  /* --- render loop --- */
   var t=0;
-  (function loop(){
-    requestAnimationFrame(loop);
+  function draw(){
+    requestAnimationFrame(draw);
     t+=.004;
     resize();
 
     smx+=(mx-smx)*.035;
     smy+=(my-smy)*.035;
 
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    var W=c.width,H=c.height;
+    var fov=Math.min(W,H)*0.9;
+    ctx.clearRect(0,0,W,H);
 
-    var asp=c.width/c.height;
-    var P=persp(Math.PI/4.5,asp,.1,100);
-    var V=tr(0,0,-3.8);
     var pulse=1+Math.sin(t*1.5)*.04;
 
-    /* outer geodesic sphere — purple — 162 vertices, 480 edges */
-    var mo=m4(rZ(t*.2),m4(rX(t*.35+smy*.6),rY(t*.5+smx*.6)));
-    mo=m4(sc(1.4*pulse),mo);
-    var mvpO=m4(P,m4(V,mo));
-    drawL(bOV,bOE,gO.e.length,[.55,.5,1.,.35],mvpO);
-    drawP(bOV,gO.v.length,[.6,.55,1.,.6],4,mvpO);
+    for(var li=0;li<layers.length;li++){
+      var L=layers[li];
+      var sc_=L.sc*(li===0?pulse:1);
+      var rot=m3mul(rotZ(t*L.spd[2]),m3mul(rotX(t*L.spd[1]+smy*L.mInf),rotY(t*L.spd[0]+smx*L.mInf)));
 
-    /* middle icosahedron — cyan — 12 vertices, 30 edges */
-    var mm=m4(rZ(-t*.35),m4(rX(-t*.55+smy*.7),rY(-t*.8+smx*.7)));
-    mm=m4(sc(.75),mm);
-    var mvpM=m4(P,m4(V,mm));
-    drawL(bMV,bME,gM.e.length,[.1,.95,.8,.7],mvpM);
-    drawP(bMV,gM.v.length,[.2,1.,.85,.9],8,mvpM);
+      /* project all vertices */
+      var proj=[];
+      for(var i=0;i<L.v.length;i++){
+        var tv=transform(L.v[i],rot,sc_);
+        proj[i]=project(tv,W,H,fov);
+      }
 
-    /* inner octahedron — red/orange — 6 vertices, 12 edges */
-    var mi=m4(rZ(t*.7),m4(rX(t*.9+smy*.9),rY(t*1.3+smx*.9)));
-    mi=m4(sc(.4),mi);
-    var mvpI=m4(P,m4(V,mi));
-    drawL(bIV,bIE,gI.e.length,[1.,.5,.45,.85],mvpI);
-    drawP(bIV,gI.v.length,[1.,.6,.5,1.],12,mvpI);
-  })();
+      /* draw edges */
+      ctx.lineWidth=L.lw*DPR;
+      ctx.strokeStyle='rgba('+L.col+','+L.la+')';
+      ctx.beginPath();
+      for(var i=0;i<L.e.length;i++){
+        var a=proj[L.e[i][0]],b=proj[L.e[i][1]];
+        ctx.moveTo(a[0],a[1]);
+        ctx.lineTo(b[0],b[1]);
+      }
+      ctx.stroke();
+
+      /* draw vertices as glowing dots */
+      for(var i=0;i<proj.length;i++){
+        var p=proj[i];
+        var r=L.pr*DPR;
+        var g=ctx.createRadialGradient(p[0],p[1],0,p[0],p[1],r*2.5);
+        g.addColorStop(0,'rgba('+L.col+','+L.pa+')');
+        g.addColorStop(1,'rgba('+L.col+',0)');
+        ctx.fillStyle=g;
+        ctx.beginPath();
+        ctx.arc(p[0],p[1],r*2.5,0,Math.PI*2);
+        ctx.fill();
+      }
+    }
+  }
+  draw();
 })();
 </script>
 </body>
