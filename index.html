@@ -156,7 +156,6 @@
     height: min(680px, 85vw);
     pointer-events: none;
     z-index: 0;
-    mix-blend-mode: screen;
   }
   .hero > .container { position: relative; z-index: 1; }
 
@@ -804,7 +803,7 @@ document.addEventListener('DOMContentLoaded', () => {
 (function(){
   var c=document.getElementById('webgl-geo');
   if(!c)return;
-  var gl=c.getContext('webgl',{alpha:true,antialias:true,premultipliedAlpha:false});
+  var gl=c.getContext('webgl',{alpha:true,antialias:true,premultipliedAlpha:true});
   if(!gl)return;
 
   var DPR=1;
@@ -885,8 +884,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* --- render --- */
   gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
-  gl.clearColor(0,0,0,1);
+  gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE,gl.ONE,gl.ONE);
+  gl.clearColor(0,0,0,0);
   gl.lineWidth(Math.min(3,gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE)[1]));
 
   function drawL(vb,eb,n,col,mvp){
