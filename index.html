@@ -839,33 +839,59 @@ document.addEventListener('DOMContentLoaded', () => {
   var octV=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
   var octF=[[0,2,4],[0,4,3],[0,3,5],[0,5,2],[1,2,5],[1,5,3],[1,3,4],[1,4,2]];
 
+  /* --- flatten geometry for cache-friendly access --- */
   var layers=[
-    {v:s2.v,e:getEdges(s2.f),sc:1.5,spd:[.5,.35,.2],mInf:.6,lw:0.6,la:.1,col:'108,99,255',pa:.25,pr:1.5},
-    {v:icoV,e:getEdges(icoF),sc:.8,spd:[-.8,-.55,-.35],mInf:.7,lw:1.2,la:.25,col:'0,212,170',pa:.5,pr:2.5},
-    {v:octV,e:getEdges(octF),sc:.35,spd:[1.3,.9,.7],mInf:.9,lw:1.8,la:.45,col:'255,107,107',pa:.7,pr:4}
+    {sc:1.5,spd:[.5,.35,.2],mInf:.6,lw:0.6,la:.1,col:'108,99,255',pa:.25,pr:1.5},
+    {sc:.8,spd:[-.8,-.55,-.35],mInf:.7,lw:1.2,la:.25,col:'0,212,170',pa:.5,pr:2.5},
+    {sc:.35,spd:[1.3,.9,.7],mInf:.9,lw:1.8,la:.45,col:'255,107,107',pa:.7,pr:4}
+  ];
+  var geoSets=[
+    {v:s2.v,e:getEdges(s2.f)},
+    {v:icoV,e:getEdges(icoF)},
+    {v:octV,e:getEdges(octF)}
   ];
 
-  /* --- 3D math --- */
-  function rotX(a){var c=Math.cos(a),s=Math.sin(a);return[1,0,0,0,c,s,0,-s,c];}
-  function rotY(a){var c=Math.cos(a),s=Math.sin(a);return[c,0,-s,0,1,0,s,0,c];}
-  function rotZ(a){var c=Math.cos(a),s=Math.sin(a);return[c,s,0,-s,c,0,0,0,1];}
-  function m3mul(a,b){
-    var o=new Array(9);
-    for(var i=0;i<3;i++)for(var j=0;j<3;j++)
-      o[i*3+j]=a[i*3]*b[j]+a[i*3+1]*b[3+j]+a[i*3+2]*b[6+j];
-    return o;
+  /* pre-flatten vertices into Float64Arrays, edges into flat Uint16Arrays */
+  for(var li=0;li<3;li++){
+    var g=geoSets[li],nv=g.v.length,ne=g.e.length;
+    var fv=new Float64Array(nv*3);
+    for(var i=0;i<nv;i++){fv[i*3]=g.v[i][0];fv[i*3+1]=g.v[i][1];fv[i*3+2]=g.v[i][2];}
+    var fe=new Uint16Array(ne*2);
+    for(var i=0;i<ne;i++){fe[i*2]=g.e[i][0];fe[i*2+1]=g.e[i][1];}
+    layers[li].fv=fv;layers[li].fe=fe;layers[li].nv=nv;layers[li].ne=ne;
+    /* pre-allocate projection buffer: x,y per vertex */
+    layers[li].proj=new Float64Array(nv*2);
   }
-  function transform(v,m,s){
-    return[
-      (m[0]*v[0]+m[1]*v[1]+m[2]*v[2])*s,
-      (m[3]*v[0]+m[4]*v[1]+m[5]*v[2])*s,
-      (m[6]*v[0]+m[7]*v[1]+m[8]*v[2])*s
-    ];
+
+  /* --- pre-render glow sprites (offscreen canvas per layer) --- */
+  function makeGlowSprite(col,alpha,radius){
+    var sz=Math.ceil(radius*2)|0;if(sz<2)sz=2;
+    var oc=document.createElement('canvas');oc.width=sz;oc.height=sz;
+    var ox=oc.getContext('2d');
+    var gr=ox.createRadialGradient(sz/2,sz/2,0,sz/2,sz/2,sz/2);
+    gr.addColorStop(0,'rgba('+col+','+alpha+')');
+    gr.addColorStop(1,'rgba('+col+',0)');
+    ox.fillStyle=gr;ox.fillRect(0,0,sz,sz);
+    return oc;
   }
-  function project(v,w,h,fov){
-    var z=v[2]-3.5;
-    var f=fov/(-z);
-    return[w/2+v[0]*f,h/2-v[1]*f,z];
+  var sprites=[];
+  function rebuildSprites(){
+    sprites=[];
+    for(var i=0;i<3;i++){
+      var L=layers[i],r=L.pr*DPR*2.5;
+      sprites[i]=makeGlowSprite(L.col,L.pa,r);
+    }
+  }
+  rebuildSprites();
+
+  /* --- 3D math (inlined rotation, no intermediate arrays) --- */
+  var R=new Float64Array(9); /* shared rotation matrix */
+  function buildRot(ay,ax,az){
+    var cy=Math.cos(ay),sy=Math.sin(ay),cx=Math.cos(ax),sx=Math.sin(ax),cz=Math.cos(az),sz=Math.sin(az);
+    /* Rz * Rx * Ry  (composed analytically to avoid 2 m3mul calls) */
+    R[0]=cz*cy+sz*sx*sy; R[1]=sz*cx; R[2]=-cz*sy+sz*sx*cy;
+    R[3]=-sz*cy+cz*sx*sy;R[4]=cz*cx; R[5]=sz*sy+cz*sx*cy;
+    R[6]=cx*sy;           R[7]=-sx;   R[8]=cx*cy;
   }
 
   /* --- mouse --- */
@@ -875,56 +901,58 @@ document.addEventListener('DOMContentLoaded', () => {
     my=(e.clientY/window.innerHeight-.5)*2;
   });
 
+  /* resize only on event, rebuild sprites when DPR changes */
+  var needResize=false;
+  window.addEventListener('resize',function(){needResize=true;});
+
   /* --- render loop --- */
   var t=0;
   function draw(){
     requestAnimationFrame(draw);
     t+=.004;
-    resize();
+
+    if(needResize){resize();rebuildSprites();needResize=false;}
 
     smx+=(mx-smx)*.035;
     smy+=(my-smy)*.035;
 
-    var W=c.width,H=c.height;
+    var W=c.width,H=c.height,hw=W*0.5,hh=H*0.5;
     var fov=Math.min(W,H)*0.9;
     ctx.clearRect(0,0,W,H);
 
     var pulse=1+Math.sin(t*1.5)*.04;
 
-    for(var li=0;li<layers.length;li++){
-      var L=layers[li];
+    for(var li=0;li<3;li++){
+      var L=layers[li],fv=L.fv,fe=L.fe,nv=L.nv,ne=L.ne,pr=L.proj;
       var sc_=L.sc*(li===0?pulse:1);
-      var rot=m3mul(rotZ(t*L.spd[2]),m3mul(rotX(t*L.spd[1]+smy*L.mInf),rotY(t*L.spd[0]+smx*L.mInf)));
 
-      /* project all vertices */
-      var proj=[];
-      for(var i=0;i<L.v.length;i++){
-        var tv=transform(L.v[i],rot,sc_);
-        proj[i]=project(tv,W,H,fov);
+      /* build combined rotation matrix (single call, no allocs) */
+      buildRot(t*L.spd[0]+smx*L.mInf, t*L.spd[1]+smy*L.mInf, t*L.spd[2]);
+
+      /* transform + project all vertices (inline, no temp arrays) */
+      for(var i=0,i3=0,i2=0;i<nv;i++,i3+=3,i2+=2){
+        var vx=fv[i3],vy=fv[i3+1],vz=fv[i3+2];
+        var tz=(R[6]*vx+R[7]*vy+R[8]*vz)*sc_-3.5;
+        var f=fov/(-tz);
+        pr[i2]  =hw+(R[0]*vx+R[1]*vy+R[2]*vz)*sc_*f;
+        pr[i2+1]=hh-(R[3]*vx+R[4]*vy+R[5]*vz)*sc_*f;
       }
 
-      /* draw edges */
+      /* draw edges (single batched path) */
       ctx.lineWidth=L.lw*DPR;
       ctx.strokeStyle='rgba('+L.col+','+L.la+')';
       ctx.beginPath();
-      for(var i=0;i<L.e.length;i++){
-        var a=proj[L.e[i][0]],b=proj[L.e[i][1]];
-        ctx.moveTo(a[0],a[1]);
-        ctx.lineTo(b[0],b[1]);
+      for(var i=0,i2=0;i<ne;i++,i2+=2){
+        var ai=fe[i2]<<1,bi=fe[i2+1]<<1;
+        ctx.moveTo(pr[ai],pr[ai+1]);
+        ctx.lineTo(pr[bi],pr[bi+1]);
       }
       ctx.stroke();
 
-      /* draw vertices as glowing dots */
-      for(var i=0;i<proj.length;i++){
-        var p=proj[i];
-        var r=L.pr*DPR;
-        var g=ctx.createRadialGradient(p[0],p[1],0,p[0],p[1],r*2.5);
-        g.addColorStop(0,'rgba('+L.col+','+L.pa+')');
-        g.addColorStop(1,'rgba('+L.col+',0)');
-        ctx.fillStyle=g;
-        ctx.beginPath();
-        ctx.arc(p[0],p[1],r*2.5,0,Math.PI*2);
-        ctx.fill();
+      /* draw vertices (pre-rendered sprite, single drawImage per vertex) */
+      var spr=sprites[li],ss=spr.width,sh=ss*0.5;
+      for(var i=0,i2=0;i<nv;i++,i2+=2){
+        ctx.drawImage(spr,pr[i2]-sh,pr[i2+1]-sh);
       }
     }
   }
