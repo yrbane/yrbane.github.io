@@ -905,11 +905,21 @@ document.addEventListener('DOMContentLoaded', () => {
   var needResize=false;
   window.addEventListener('resize',function(){needResize=true;});
 
+  /* --- visibility: pause when hero is off-screen --- */
+  var visible=true;
+  var visObs=new IntersectionObserver(function(entries){
+    visible=entries[0].isIntersecting;
+  },{threshold:0});
+  visObs.observe(c);
+
   /* --- render loop --- */
-  var t=0;
-  function draw(){
+  var t=0,lastT=0;
+  function draw(now){
     requestAnimationFrame(draw);
-    t+=.004;
+    if(!visible)return;
+    if(!lastT)lastT=now;
+    t+=(now-lastT)*0.000004;
+    lastT=now;
 
     if(needResize){resize();rebuildSprites();needResize=false;}
 
