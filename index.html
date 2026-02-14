@@ -533,6 +533,29 @@
   .delay-3 { animation-delay: .3s; }
   .delay-4 { animation-delay: .4s; }
   .delay-5 { animation-delay: .5s; }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     ROCKET
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .rocket {
+    position: fixed;
+    z-index: 50;
+    pointer-events: none;
+    width: 64px; height: 64px;
+    /* start off-screen bottom-left */
+    left: -80px; bottom: -80px;
+    opacity: 0;
+    filter: drop-shadow(0 0 12px rgba(255,160,40,.5));
+    transition: none;
+    will-change: transform, opacity;
+  }
+  @keyframes flame {
+    0%, 100% { transform: scaleY(1) scaleX(1); opacity: .9; }
+    50%      { transform: scaleY(1.3) scaleX(.8); opacity: 1; }
+  }
+  .rocket svg .flame1 { animation: flame .12s ease-in-out infinite; transform-origin: center top; }
+  .rocket svg .flame2 { animation: flame .1s ease-in-out infinite .05s; transform-origin: center top; }
+  .rocket svg .flame3 { animation: flame .14s ease-in-out infinite .08s; transform-origin: center top; }
 </style>
 </head>
 <body>
@@ -790,6 +813,33 @@
   </div>
 </section>
 
+<!-- Cartoon rocket -->
+<div class="rocket" id="rocket">
+  <svg viewBox="0 0 64 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Flames -->
+    <ellipse class="flame1" cx="32" cy="82" rx="6" ry="12" fill="#ff6b2b"/>
+    <ellipse class="flame2" cx="26" cy="80" rx="4" ry="10" fill="#ffb347"/>
+    <ellipse class="flame3" cx="38" cy="80" rx="4" ry="10" fill="#ffb347"/>
+    <ellipse cx="32" cy="78" rx="3" ry="6" fill="#ffe066"/>
+    <!-- Fins -->
+    <path d="M14 62 Q10 70 16 72 L22 62Z" fill="#ff6b6b" stroke="#d94848" stroke-width=".8"/>
+    <path d="M50 62 Q54 70 48 72 L42 62Z" fill="#ff6b6b" stroke="#d94848" stroke-width=".8"/>
+    <!-- Body -->
+    <rect x="20" y="24" width="24" height="44" rx="12" fill="#e8eaf0" stroke="#b0b4c0" stroke-width="1"/>
+    <!-- Body highlight -->
+    <rect x="23" y="28" width="6" height="36" rx="3" fill="rgba(255,255,255,.45)"/>
+    <!-- Nose cone -->
+    <path d="M20 28 Q20 12 32 4 Q44 12 44 28Z" fill="#ff6b6b" stroke="#d94848" stroke-width=".8"/>
+    <path d="M24 26 Q26 16 32 10" stroke="rgba(255,255,255,.5)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <!-- Window -->
+    <circle cx="32" cy="40" r="7" fill="#1a1a3a" stroke="#8888aa" stroke-width="1.2"/>
+    <circle cx="32" cy="40" r="5" fill="#2a3a6a"/>
+    <ellipse cx="30" cy="38" rx="2" ry="1.5" fill="rgba(100,180,255,.4)"/>
+    <!-- Bottom ring -->
+    <rect x="19" y="64" width="26" height="5" rx="2.5" fill="#b0b4c0" stroke="#888" stroke-width=".5"/>
+  </svg>
+</div>
+
 <!-- ═════════════════════════════════════════════════════════════════════════
      FOOTER
      ═══════════════════════════════════════════════════════════════════════ -->
@@ -858,7 +908,11 @@ document.addEventListener('DOMContentLoaded', () => {
     lastScrollT = now;
   }, { passive: true });
 
-  // Unified rAF loop: mouse parallax + scroll warp on stars
+  // Rocket element
+  const rocket = document.getElementById('rocket');
+  let rocketProgress = -1; // -1 = hidden, 0..1 = flight path
+
+  // Unified rAF loop: mouse parallax + scroll warp on stars + rocket
   (function warpLoop() {
     requestAnimationFrame(warpLoop);
 
@@ -879,6 +933,43 @@ document.addEventListener('DOMContentLoaded', () => {
       layer.style.transform = `translate(${px}px, ${py}px) scaleY(${stretch})`;
       layer.style.opacity = Math.min(1, brightness);
     });
+
+    // Rocket: flies across screen when near bottom
+    const scrollMax = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollRatio = scrollMax > 0 ? window.scrollY / scrollMax : 0;
+    // Activate in last 25% of scroll
+    const threshold = 0.75;
+    if (scrollRatio > threshold) {
+      const t = (scrollRatio - threshold) / (1 - threshold); // 0..1
+      rocketProgress = t;
+    } else {
+      rocketProgress = -1;
+    }
+
+    if (rocketProgress >= 0 && rocket) {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const p = rocketProgress;
+      // Fly from bottom-left to top-right with a slight curve
+      const x = -80 + (vw + 160) * p;
+      const y = vh + 40 - (vh + 160) * p - Math.sin(p * Math.PI) * 80;
+      // Slight wobble + tilt
+      const wobble = Math.sin(p * 12) * 4;
+      const tilt = -35 + p * 10 + Math.sin(p * 8) * 3;
+      // Fade in at start, fade out at end
+      const fade = p < 0.1 ? p / 0.1 : p > 0.85 ? (1 - p) / 0.15 : 1;
+      const scale = 0.8 + Math.sin(p * Math.PI) * 0.4;
+
+      rocket.style.left = x + 'px';
+      rocket.style.bottom = 'auto';
+      rocket.style.top = y + 'px';
+      rocket.style.opacity = fade;
+      rocket.style.transform =
+        `rotate(${tilt}deg) translateX(${wobble}px) scale(${scale})` +
+        ` perspective(200px) rotateY(${Math.sin(p * 6) * 12}deg)`;
+    } else if (rocket) {
+      rocket.style.opacity = '0';
+    }
   })();
 });
 </script>
