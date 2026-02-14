@@ -887,6 +887,7 @@ document.addEventListener('DOMContentLoaded', () => {
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
   gl.clearColor(0,0,0,1);
+  gl.lineWidth(Math.min(3,gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE)[1]));
 
   function drawL(vb,eb,n,col,mvp){
     gl.useProgram(pL);
@@ -923,29 +924,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     var asp=c.width/c.height;
     var P=persp(Math.PI/4.5,asp,.1,100);
-    var V=tr(0,0,-4.2);
+    var V=tr(0,0,-3.8);
     var pulse=1+Math.sin(t*1.5)*.04;
 
     /* outer geodesic sphere — purple — 162 vertices, 480 edges */
     var mo=m4(rZ(t*.2),m4(rX(t*.35+smy*.6),rY(t*.5+smx*.6)));
-    mo=m4(sc(1.35*pulse),mo);
+    mo=m4(sc(1.4*pulse),mo);
     var mvpO=m4(P,m4(V,mo));
-    drawL(bOV,bOE,gO.e.length,[.42,.39,1.,.22],mvpO);
-    drawP(bOV,gO.v.length,[.42,.39,1.,.45],3.5,mvpO);
+    drawL(bOV,bOE,gO.e.length,[.55,.5,1.,.35],mvpO);
+    drawP(bOV,gO.v.length,[.6,.55,1.,.6],4,mvpO);
 
     /* middle icosahedron — cyan — 12 vertices, 30 edges */
     var mm=m4(rZ(-t*.35),m4(rX(-t*.55+smy*.7),rY(-t*.8+smx*.7)));
-    mm=m4(sc(.72),mm);
+    mm=m4(sc(.75),mm);
     var mvpM=m4(P,m4(V,mm));
-    drawL(bMV,bME,gM.e.length,[0,.83,.67,.5],mvpM);
-    drawP(bMV,gM.v.length,[0,.83,.67,.8],6,mvpM);
+    drawL(bMV,bME,gM.e.length,[.1,.95,.8,.7],mvpM);
+    drawP(bMV,gM.v.length,[.2,1.,.85,.9],8,mvpM);
 
     /* inner octahedron — red/orange — 6 vertices, 12 edges */
     var mi=m4(rZ(t*.7),m4(rX(t*.9+smy*.9),rY(t*1.3+smx*.9)));
-    mi=m4(sc(.38),mi);
+    mi=m4(sc(.4),mi);
     var mvpI=m4(P,m4(V,mi));
-    drawL(bIV,bIE,gI.e.length,[1.,.42,.42,.6],mvpI);
-    drawP(bIV,gI.v.length,[1.,.42,.42,.9],9,mvpI);
+    drawL(bIV,bIE,gI.e.length,[1.,.5,.45,.85],mvpI);
+    drawP(bIV,gI.v.length,[1.,.6,.5,1.],12,mvpI);
   })();
 })();
 </script>
