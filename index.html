@@ -156,6 +156,7 @@
     height: min(680px, 85vw);
     pointer-events: none;
     z-index: 0;
+    mix-blend-mode: screen;
   }
   .hero > .container { position: relative; z-index: 1; }
 
@@ -885,7 +886,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* --- render --- */
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
-  gl.clearColor(0,0,0,0);
+  gl.clearColor(0,0,0,1);
 
   function drawL(vb,eb,n,col,mvp){
     gl.useProgram(pL);
@@ -929,22 +930,22 @@ document.addEventListener('DOMContentLoaded', () => {
     var mo=m4(rZ(t*.2),m4(rX(t*.35+smy*.6),rY(t*.5+smx*.6)));
     mo=m4(sc(1.35*pulse),mo);
     var mvpO=m4(P,m4(V,mo));
-    drawL(bOV,bOE,gO.e.length,[.42,.39,1.,.1],mvpO);
-    drawP(bOV,gO.v.length,[.42,.39,1.,.22],2.5,mvpO);
+    drawL(bOV,bOE,gO.e.length,[.42,.39,1.,.22],mvpO);
+    drawP(bOV,gO.v.length,[.42,.39,1.,.45],3.5,mvpO);
 
     /* middle icosahedron — cyan — 12 vertices, 30 edges */
     var mm=m4(rZ(-t*.35),m4(rX(-t*.55+smy*.7),rY(-t*.8+smx*.7)));
     mm=m4(sc(.72),mm);
     var mvpM=m4(P,m4(V,mm));
-    drawL(bMV,bME,gM.e.length,[0,.83,.67,.28],mvpM);
-    drawP(bMV,gM.v.length,[0,.83,.67,.55],4.5,mvpM);
+    drawL(bMV,bME,gM.e.length,[0,.83,.67,.5],mvpM);
+    drawP(bMV,gM.v.length,[0,.83,.67,.8],6,mvpM);
 
     /* inner octahedron — red/orange — 6 vertices, 12 edges */
     var mi=m4(rZ(t*.7),m4(rX(t*.9+smy*.9),rY(t*1.3+smx*.9)));
     mi=m4(sc(.38),mi);
     var mvpI=m4(P,m4(V,mi));
-    drawL(bIV,bIE,gI.e.length,[1.,.42,.42,.35],mvpI);
-    drawP(bIV,gI.v.length,[1.,.42,.42,.7],6,mvpI);
+    drawL(bIV,bIE,gI.e.length,[1.,.42,.42,.6],mvpI);
+    drawP(bIV,gI.v.length,[1.,.42,.42,.9],9,mvpI);
   })();
 })();
 </script>
