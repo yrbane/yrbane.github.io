@@ -961,7 +961,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Tangent direction for orientation (derivative of ellipse)
       const dx = -rx * Math.sin(theta) * (endAngle - startAngle);
       const dy = -ry * Math.cos(theta) * (endAngle - startAngle);
-      const angle = Math.atan2(-dy, dx) * (180 / PI);  // CSS rotate, Y flipped
+      const angle = Math.atan2(dy, dx) * (180 / PI);
       const tilt = angle + 90; // +90 because SVG nose points up
 
       // Scale: grows from 0.6 to 1.2 (approaching effect)
