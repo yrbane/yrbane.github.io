@@ -627,6 +627,27 @@
     contain: layout style;
     filter: drop-shadow(0 0 8px rgba(255,230,80,.6));
   }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     PLANET FOOTER
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .planet-footer {
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: 25vh;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform;
+    transform: translateY(100%);
+  }
+  .planet-footer svg {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: 100%;
+  }
 </style>
 </head>
 <body>
@@ -969,6 +990,102 @@
   </svg>
 </div>
 
+<!-- Planet footer surface -->
+<div class="planet-footer" id="planet-footer">
+  <svg viewBox="0 0 1600 350" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="plGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#d4b87a"/>
+        <stop offset="25%" stop-color="#c4a46a"/>
+        <stop offset="55%" stop-color="#a8884e"/>
+        <stop offset="100%" stop-color="#7a6030"/>
+      </linearGradient>
+      <linearGradient id="plRim" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ffe8b0" stop-opacity=".5"/>
+        <stop offset="100%" stop-color="#d4b87a" stop-opacity="0"/>
+      </linearGradient>
+      <radialGradient id="crShade"><stop offset="0%" stop-color="#7a6030" stop-opacity=".5"/><stop offset="100%" stop-color="#7a6030" stop-opacity="0"/></radialGradient>
+      <radialGradient id="crLight"><stop offset="0%" stop-color="#e8d4a0" stop-opacity=".3"/><stop offset="100%" stop-color="#e8d4a0" stop-opacity="0"/></radialGradient>
+    </defs>
+    <!-- Planet curved surface with crater-shaped rim -->
+    <path d="
+      M-20,140
+      Q60,132 120,128
+      C160,126 180,142 220,148
+      C260,154 290,140 310,128
+      Q380,108 440,100
+      C470,97 490,105 520,118
+      C560,135 590,142 620,136
+      C650,128 670,108 720,95
+      Q800,78 880,74
+      Q920,72 960,74
+      Q1020,78 1060,86
+      C1100,95 1120,115 1160,128
+      C1200,142 1240,148 1270,138
+      C1300,128 1310,105 1340,96
+      Q1400,82 1460,92
+      C1490,98 1510,118 1540,126
+      C1570,134 1590,130 1620,128
+      L1620,360 L-20,360 Z
+    " fill="url(#plGrad)"/>
+    <!-- Atmosphere glow at horizon -->
+    <path d="
+      M-20,140 Q60,132 120,128 C160,126 180,142 220,148 C260,154 290,140 310,128
+      Q380,108 440,100 C470,97 490,105 520,118 C560,135 590,142 620,136
+      C650,128 670,108 720,95 Q800,78 880,74 Q920,72 960,74 Q1020,78 1060,86
+      C1100,95 1120,115 1160,128 C1200,142 1240,148 1270,138 C1300,128 1310,105 1340,96
+      Q1400,82 1460,92 C1490,98 1510,118 1540,126 C1570,134 1590,130 1620,128
+    " fill="none" stroke="url(#plRim)" stroke-width="6"/>
+
+    <!-- ══ Large craters ══ -->
+    <!-- Crater 1: large left -->
+    <ellipse cx="265" cy="148" rx="55" ry="16" fill="#a08050" opacity=".6"/>
+    <ellipse cx="265" cy="145" rx="48" ry="12" fill="#b89868" opacity=".5"/>
+    <ellipse cx="250" cy="143" rx="20" ry="6" fill="#c4a878" opacity=".3"/>
+
+    <!-- Crater 2: huge center-left (the biggest) -->
+    <ellipse cx="560" cy="138" rx="75" ry="22" fill="#9a7848" opacity=".5"/>
+    <ellipse cx="560" cy="134" rx="65" ry="16" fill="#b08a58" opacity=".45"/>
+    <ellipse cx="540" cy="131" rx="30" ry="8" fill="#c4a070" opacity=".25"/>
+    <ellipse cx="580" cy="136" rx="15" ry="5" fill="#8a6a3a" opacity=".3"/>
+
+    <!-- Crater 3: wide center (near horizon) -->
+    <ellipse cx="880" cy="78" rx="90" ry="18" fill="#b89060" opacity=".35"/>
+    <ellipse cx="880" cy="76" rx="75" ry="12" fill="#c8a878" opacity=".3"/>
+    <ellipse cx="860" cy="74" rx="25" ry="6" fill="#d4b888" opacity=".2"/>
+
+    <!-- Crater 4: right side -->
+    <ellipse cx="1200" cy="140" rx="60" ry="18" fill="#9a7848" opacity=".5"/>
+    <ellipse cx="1200" cy="137" rx="50" ry="13" fill="#b08a58" opacity=".4"/>
+    <ellipse cx="1185" cy="135" rx="20" ry="5" fill="#c4a070" opacity=".25"/>
+
+    <!-- Crater 5: far right -->
+    <ellipse cx="1480" cy="94" rx="45" ry="14" fill="#a08050" opacity=".45"/>
+    <ellipse cx="1480" cy="92" rx="38" ry="10" fill="#b89868" opacity=".35"/>
+
+    <!-- ══ Small craters scattered on surface ══ -->
+    <ellipse cx="160" cy="155" rx="18" ry="6" fill="#9a7848" opacity=".3"/>
+    <ellipse cx="390" cy="115" rx="22" ry="7" fill="#8a6a3a" opacity=".35"/>
+    <ellipse cx="690" cy="105" rx="15" ry="5" fill="#9a7848" opacity=".3"/>
+    <ellipse cx="1050" cy="96" rx="20" ry="6" fill="#8a6a3a" opacity=".3"/>
+    <ellipse cx="1350" cy="102" rx="16" ry="5" fill="#9a7848" opacity=".3"/>
+
+    <!-- ══ Surface ridges / texture lines ══ -->
+    <path d="M100,170 Q200,165 300,175 Q400,168 500,172" stroke="#b89060" stroke-width=".8" fill="none" opacity=".25"/>
+    <path d="M600,165 Q750,155 900,160 Q1000,158 1100,165" stroke="#b89060" stroke-width=".8" fill="none" opacity=".2"/>
+    <path d="M1150,170 Q1300,162 1450,168" stroke="#b89060" stroke-width=".7" fill="none" opacity=".2"/>
+    <path d="M200,200 Q450,190 700,198 Q900,192 1100,200 Q1350,195 1500,202" stroke="#a08050" stroke-width=".6" fill="none" opacity=".15"/>
+
+    <!-- Tiny impact dots -->
+    <circle cx="340" cy="130" r="3" fill="#8a6a3a" opacity=".25"/>
+    <circle cx="480" cy="112" r="2.5" fill="#8a6a3a" opacity=".2"/>
+    <circle cx="760" cy="92" r="3.5" fill="#8a6a3a" opacity=".2"/>
+    <circle cx="1000" cy="90" r="2" fill="#8a6a3a" opacity=".25"/>
+    <circle cx="1130" cy="118" r="3" fill="#8a6a3a" opacity=".2"/>
+    <circle cx="1420" cy="98" r="2.5" fill="#8a6a3a" opacity=".2"/>
+  </svg>
+</div>
+
 <!-- ═════════════════════════════════════════════════════════════════════════
      FOOTER
      ═══════════════════════════════════════════════════════════════════════ -->
@@ -1035,6 +1152,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const rocket = document.getElementById('rocket');
   const bigMeteor = document.getElementById('big-meteor');
   const cartoonStar = document.getElementById('cartoon-star');
+  const planetFooter = document.getElementById('planet-footer');
   let smoothVel = 0, prevScroll = window.scrollY;
 
   // Generate meteorites
@@ -1182,6 +1300,23 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (rocket) {
       if (rocket.classList.contains('flying')) rocket.classList.remove('flying');
       if (rocket.style.opacity !== '0') rocket.style.opacity = '0';
+    }
+
+    // Planet footer: rises from bottom in last 25% of scroll
+    if (planetFooter) {
+      const plStart = 0.75;
+      if (scrollRatio > plStart) {
+        const plp = (scrollRatio - plStart) / (1 - plStart); // 0..1
+        const rise = plp * 100; // 0% → 100% of its height visible
+        const fade = Math.min(plp / 0.15, 1);
+        planetFooter.style.opacity = fade;
+        planetFooter.style.transform = `translateY(${100 - rise}%)`;
+      } else {
+        if (planetFooter.style.opacity !== '0') {
+          planetFooter.style.opacity = '0';
+          planetFooter.style.transform = 'translateY(100%)';
+        }
+      }
     }
   };
 });
