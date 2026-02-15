@@ -543,7 +543,6 @@
     width: 64px; height: 64px;
     left: -80px; bottom: -80px;
     opacity: 0;
-    will-change: transform;
     contain: layout style;
   }
   @keyframes flame {
@@ -580,7 +579,6 @@
     width: var(--w, 3px);
     height: var(--trail, 60px);
     opacity: 0;
-    will-change: transform;
     contain: layout style;
     background: linear-gradient(to bottom,
       transparent 0%,
@@ -602,19 +600,6 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
-     BIG METEORITE (close pass)
-     ═══════════════════════════════════════════════════════════════════════════ */
-  .big-meteor {
-    position: fixed;
-    top: 0; left: 0;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0;
-    will-change: transform;
-    contain: layout style;
-  }
-
-  /* ═══════════════════════════════════════════════════════════════════════════
      CARTOON STAR
      ═══════════════════════════════════════════════════════════════════════════ */
   .cartoon-star {
@@ -623,9 +608,7 @@
     z-index: 0;
     pointer-events: none;
     opacity: 0;
-    will-change: transform;
     contain: layout style;
-    filter: drop-shadow(0 0 8px rgba(255,230,80,.6));
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -639,8 +622,8 @@
     z-index: 2;
     pointer-events: none;
     opacity: 0;
-    will-change: transform;
     transform: translateY(100%);
+    contain: strict;
   }
   .planet-footer svg {
     position: absolute;
@@ -935,34 +918,6 @@
 <!-- Meteorites container (populated by JS) -->
 <div class="meteors" id="meteors"></div>
 
-<!-- Big close-pass meteorite -->
-<div class="big-meteor" id="big-meteor">
-  <svg width="120" height="200" viewBox="0 0 60 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Trail -->
-    <ellipse cx="30" cy="20" rx="8" ry="20" fill="url(#bmTrail1)" opacity=".5"/>
-    <ellipse cx="30" cy="15" rx="5" ry="15" fill="url(#bmTrail2)" opacity=".7"/>
-    <ellipse cx="30" cy="10" rx="3" ry="10" fill="url(#bmTrail3)" opacity=".8"/>
-    <!-- Rocky body -->
-    <ellipse cx="30" cy="62" rx="14" ry="12" fill="#8b7355"/>
-    <ellipse cx="30" cy="61" rx="13" ry="11" fill="#a08060"/>
-    <ellipse cx="27" cy="59" rx="6" ry="5" fill="#b89870" opacity=".6"/>
-    <ellipse cx="34" cy="64" rx="4" ry="3.5" fill="#7a6245" opacity=".7"/>
-    <circle cx="25" cy="63" r="2.5" fill="#6b5540" opacity=".5"/>
-    <circle cx="33" cy="58" r="2" fill="#c4a882" opacity=".4"/>
-    <!-- Glow around rock -->
-    <ellipse cx="30" cy="62" rx="18" ry="16" fill="url(#bmGlow)" opacity=".6"/>
-    <!-- Fire rim -->
-    <ellipse cx="30" cy="55" rx="12" ry="5" fill="url(#bmFire)" opacity=".7"/>
-    <defs>
-      <radialGradient id="bmGlow"><stop offset="40%" stop-color="#ff8833" stop-opacity=".3"/><stop offset="100%" stop-color="#ff8833" stop-opacity="0"/></radialGradient>
-      <linearGradient id="bmTrail1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff8833" stop-opacity="0"/><stop offset="100%" stop-color="#ffaa44" stop-opacity=".4"/></linearGradient>
-      <linearGradient id="bmTrail2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffcc66" stop-opacity="0"/><stop offset="100%" stop-color="#ffcc66" stop-opacity=".6"/></linearGradient>
-      <linearGradient id="bmTrail3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff" stop-opacity="0"/><stop offset="100%" stop-color="#fff" stop-opacity=".8"/></linearGradient>
-      <linearGradient id="bmFire" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffdd66"/><stop offset="100%" stop-color="#ff6622" stop-opacity="0"/></linearGradient>
-    </defs>
-  </svg>
-</div>
-
 <!-- Cartoon star -->
 <div class="cartoon-star" id="cartoon-star">
   <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -992,97 +947,100 @@
 
 <!-- Planet footer surface -->
 <div class="planet-footer" id="planet-footer">
-  <svg viewBox="0 0 1600 350" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 1600 400" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
     <defs>
+      <!-- Planet body gradient -->
       <linearGradient id="plGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#d4b87a"/>
-        <stop offset="25%" stop-color="#c4a46a"/>
-        <stop offset="55%" stop-color="#a8884e"/>
-        <stop offset="100%" stop-color="#7a6030"/>
+        <stop offset="0%" stop-color="#dcc080"/>
+        <stop offset="15%" stop-color="#c8a868"/>
+        <stop offset="40%" stop-color="#b49458"/>
+        <stop offset="70%" stop-color="#96783e"/>
+        <stop offset="100%" stop-color="#6e5828"/>
       </linearGradient>
+      <!-- Horizon atmosphere glow -->
       <linearGradient id="plRim" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#ffe8b0" stop-opacity=".5"/>
+        <stop offset="0%" stop-color="#fff0c8" stop-opacity=".6"/>
+        <stop offset="40%" stop-color="#ffe0a0" stop-opacity=".2"/>
         <stop offset="100%" stop-color="#d4b87a" stop-opacity="0"/>
       </linearGradient>
-      <radialGradient id="crShade"><stop offset="0%" stop-color="#7a6030" stop-opacity=".5"/><stop offset="100%" stop-color="#7a6030" stop-opacity="0"/></radialGradient>
-      <radialGradient id="crLight"><stop offset="0%" stop-color="#e8d4a0" stop-opacity=".3"/><stop offset="100%" stop-color="#e8d4a0" stop-opacity="0"/></radialGradient>
     </defs>
-    <!-- Planet curved surface with crater-shaped rim -->
+
+    <!-- ══ Planet body: strong spherical arc ══ -->
     <path d="
-      M-20,140
-      Q60,132 120,128
-      C160,126 180,142 220,148
-      C260,154 290,140 310,128
-      Q380,108 440,100
-      C470,97 490,105 520,118
-      C560,135 590,142 620,136
-      C650,128 670,108 720,95
-      Q800,78 880,74
-      Q920,72 960,74
-      Q1020,78 1060,86
-      C1100,95 1120,115 1160,128
-      C1200,142 1240,148 1270,138
-      C1300,128 1310,105 1340,96
-      Q1400,82 1460,92
-      C1490,98 1510,118 1540,126
-      C1570,134 1590,130 1620,128
-      L1620,360 L-20,360 Z
+      M-40,260
+      Q80,210 200,170
+      Q350,125 500,95
+      Q650,70 800,60
+      Q950,55 1000,58
+      Q1150,68 1300,95
+      Q1450,128 1550,170
+      Q1620,210 1640,260
+      L1640,410 L-40,410 Z
     " fill="url(#plGrad)"/>
-    <!-- Atmosphere glow at horizon -->
+    <!-- Atmosphere glow line -->
     <path d="
-      M-20,140 Q60,132 120,128 C160,126 180,142 220,148 C260,154 290,140 310,128
-      Q380,108 440,100 C470,97 490,105 520,118 C560,135 590,142 620,136
-      C650,128 670,108 720,95 Q800,78 880,74 Q920,72 960,74 Q1020,78 1060,86
-      C1100,95 1120,115 1160,128 C1200,142 1240,148 1270,138 C1300,128 1310,105 1340,96
-      Q1400,82 1460,92 C1490,98 1510,118 1540,126 C1570,134 1590,130 1620,128
-    " fill="none" stroke="url(#plRim)" stroke-width="6"/>
+      M-40,260 Q80,210 200,170 Q350,125 500,95 Q650,70 800,60
+      Q950,55 1000,58 Q1150,68 1300,95 Q1450,128 1550,170 Q1620,210 1640,260
+    " fill="none" stroke="url(#plRim)" stroke-width="4"/>
+    <!-- Second subtle inner glow -->
+    <path d="
+      M-40,265 Q80,216 200,176 Q350,132 500,102 Q650,78 800,68
+      Q950,63 1000,66 Q1150,76 1300,102 Q1450,135 1550,176 Q1620,216 1640,265
+    " fill="none" stroke="rgba(255,240,200,.08)" stroke-width="12"/>
 
-    <!-- ══ Large craters ══ -->
-    <!-- Crater 1: large left -->
-    <ellipse cx="265" cy="148" rx="55" ry="16" fill="#a08050" opacity=".6"/>
-    <ellipse cx="265" cy="145" rx="48" ry="12" fill="#b89868" opacity=".5"/>
-    <ellipse cx="250" cy="143" rx="20" ry="6" fill="#c4a878" opacity=".3"/>
+    <!-- ══ HUGE CRATER — Tycho-style (center-left) ══ -->
+    <ellipse cx="420" cy="135" rx="110" ry="38" fill="#8a7040" opacity=".55"/>
+    <ellipse cx="420" cy="130" rx="90" ry="28" fill="#9a8050" opacity=".45"/>
+    <ellipse cx="420" cy="127" rx="65" ry="18" fill="#a89060" opacity=".35"/>
+    <ellipse cx="415" cy="133" rx="12" ry="5" fill="#baa070" opacity=".35"/>
 
-    <!-- Crater 2: huge center-left (the biggest) -->
-    <ellipse cx="560" cy="138" rx="75" ry="22" fill="#9a7848" opacity=".5"/>
-    <ellipse cx="560" cy="134" rx="65" ry="16" fill="#b08a58" opacity=".45"/>
-    <ellipse cx="540" cy="131" rx="30" ry="8" fill="#c4a070" opacity=".25"/>
-    <ellipse cx="580" cy="136" rx="15" ry="5" fill="#8a6a3a" opacity=".3"/>
+    <!-- ══ LARGE CRATER — right side ══ -->
+    <ellipse cx="1180" cy="120" rx="90" ry="32" fill="#8a7040" opacity=".5"/>
+    <ellipse cx="1180" cy="116" rx="70" ry="22" fill="#9a8050" opacity=".4"/>
+    <ellipse cx="1180" cy="114" rx="48" ry="14" fill="#a89060" opacity=".3"/>
 
-    <!-- Crater 3: wide center (near horizon) -->
-    <ellipse cx="880" cy="78" rx="90" ry="18" fill="#b89060" opacity=".35"/>
-    <ellipse cx="880" cy="76" rx="75" ry="12" fill="#c8a878" opacity=".3"/>
-    <ellipse cx="860" cy="74" rx="25" ry="6" fill="#d4b888" opacity=".2"/>
+    <!-- ══ MEDIUM CRATER — near horizon center ══ -->
+    <ellipse cx="850" cy="75" rx="65" ry="20" fill="#8a7040" opacity=".4"/>
+    <ellipse cx="850" cy="73" rx="48" ry="13" fill="#9a8050" opacity=".35"/>
+    <ellipse cx="850" cy="71" rx="30" ry="8" fill="#a89060" opacity=".25"/>
 
-    <!-- Crater 4: right side -->
-    <ellipse cx="1200" cy="140" rx="60" ry="18" fill="#9a7848" opacity=".5"/>
-    <ellipse cx="1200" cy="137" rx="50" ry="13" fill="#b08a58" opacity=".4"/>
-    <ellipse cx="1185" cy="135" rx="20" ry="5" fill="#c4a070" opacity=".25"/>
+    <!-- ══ MEDIUM CRATER — far left ══ -->
+    <ellipse cx="140" cy="210" rx="55" ry="22" fill="#8a7040" opacity=".45"/>
+    <ellipse cx="140" cy="207" rx="40" ry="15" fill="#9a8050" opacity=".35"/>
+    <ellipse cx="140" cy="205" rx="25" ry="9" fill="#a89060" opacity=".25"/>
 
-    <!-- Crater 5: far right -->
-    <ellipse cx="1480" cy="94" rx="45" ry="14" fill="#a08050" opacity=".45"/>
-    <ellipse cx="1480" cy="92" rx="38" ry="10" fill="#b89868" opacity=".35"/>
+    <!-- ══ MEDIUM CRATER — far right ══ -->
+    <ellipse cx="1450" cy="155" rx="60" ry="22" fill="#8a7040" opacity=".45"/>
+    <ellipse cx="1450" cy="152" rx="44" ry="15" fill="#9a8050" opacity=".35"/>
+    <ellipse cx="1450" cy="150" rx="28" ry="9" fill="#a89060" opacity=".25"/>
 
-    <!-- ══ Small craters scattered on surface ══ -->
-    <ellipse cx="160" cy="155" rx="18" ry="6" fill="#9a7848" opacity=".3"/>
-    <ellipse cx="390" cy="115" rx="22" ry="7" fill="#8a6a3a" opacity=".35"/>
-    <ellipse cx="690" cy="105" rx="15" ry="5" fill="#9a7848" opacity=".3"/>
-    <ellipse cx="1050" cy="96" rx="20" ry="6" fill="#8a6a3a" opacity=".3"/>
-    <ellipse cx="1350" cy="102" rx="16" ry="5" fill="#9a7848" opacity=".3"/>
+    <!-- ══ SMALL CRATERS (2 layers each) ══ -->
+    <ellipse cx="660" cy="88" rx="30" ry="11" fill="#8a7040" opacity=".38"/>
+    <ellipse cx="660" cy="86" rx="20" ry="7" fill="#a89060" opacity=".3"/>
+    <ellipse cx="1020" cy="82" rx="28" ry="10" fill="#8a7040" opacity=".35"/>
+    <ellipse cx="1020" cy="80" rx="18" ry="6" fill="#a89060" opacity=".28"/>
+    <ellipse cx="530" cy="105" rx="22" ry="9" fill="#8a7040" opacity=".32"/>
+    <ellipse cx="530" cy="103" rx="14" ry="5" fill="#a89060" opacity=".25"/>
+    <ellipse cx="300" cy="155" rx="25" ry="10" fill="#8a7040" opacity=".35"/>
+    <ellipse cx="300" cy="153" rx="16" ry="6" fill="#a89060" opacity=".28"/>
+    <ellipse cx="1320" cy="108" rx="24" ry="9" fill="#8a7040" opacity=".33"/>
+    <ellipse cx="1320" cy="106" rx="15" ry="5" fill="#a89060" opacity=".26"/>
+    <ellipse cx="580" cy="175" rx="28" ry="12" fill="#8a7040" opacity=".3"/>
+    <ellipse cx="960" cy="100" rx="20" ry="8" fill="#8a7040" opacity=".3"/>
+    <ellipse cx="1100" cy="165" rx="32" ry="13" fill="#8a7040" opacity=".33"/>
 
-    <!-- ══ Surface ridges / texture lines ══ -->
-    <path d="M100,170 Q200,165 300,175 Q400,168 500,172" stroke="#b89060" stroke-width=".8" fill="none" opacity=".25"/>
-    <path d="M600,165 Q750,155 900,160 Q1000,158 1100,165" stroke="#b89060" stroke-width=".8" fill="none" opacity=".2"/>
-    <path d="M1150,170 Q1300,162 1450,168" stroke="#b89060" stroke-width=".7" fill="none" opacity=".2"/>
-    <path d="M200,200 Q450,190 700,198 Q900,192 1100,200 Q1350,195 1500,202" stroke="#a08050" stroke-width=".6" fill="none" opacity=".15"/>
+    <!-- ══ TINY CRATERS ══ -->
+    <ellipse cx="220" cy="180" rx="10" ry="4" fill="#7a6432" opacity=".3"/>
+    <ellipse cx="480" cy="150" rx="12" ry="5" fill="#7a6432" opacity=".28"/>
+    <ellipse cx="720" cy="96" rx="9" ry="3.5" fill="#7a6432" opacity=".25"/>
+    <ellipse cx="900" cy="90" rx="11" ry="4" fill="#7a6432" opacity=".28"/>
+    <ellipse cx="1250" cy="145" rx="8" ry="3" fill="#7a6432" opacity=".22"/>
+    <ellipse cx="1530" cy="185" rx="9" ry="4" fill="#7a6432" opacity=".25"/>
+    <ellipse cx="80" cy="240" rx="11" ry="5" fill="#7a6432" opacity=".25"/>
 
-    <!-- Tiny impact dots -->
-    <circle cx="340" cy="130" r="3" fill="#8a6a3a" opacity=".25"/>
-    <circle cx="480" cy="112" r="2.5" fill="#8a6a3a" opacity=".2"/>
-    <circle cx="760" cy="92" r="3.5" fill="#8a6a3a" opacity=".2"/>
-    <circle cx="1000" cy="90" r="2" fill="#8a6a3a" opacity=".25"/>
-    <circle cx="1130" cy="118" r="3" fill="#8a6a3a" opacity=".2"/>
-    <circle cx="1420" cy="98" r="2.5" fill="#8a6a3a" opacity=".2"/>
+    <!-- ══ Surface ridges ══ -->
+    <path d="M50,240 Q400,170 800,138 Q1200,148 1560,210" stroke="#a89060" stroke-width=".7" fill="none" opacity=".12"/>
+    <path d="M30,280 Q400,215 800,185 Q1200,195 1580,250" stroke="#96783e" stroke-width=".6" fill="none" opacity=".1"/>
   </svg>
 </div>
 
@@ -1150,7 +1108,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Cache DOM refs
   const starLayers = document.querySelectorAll('.stars-1,.stars-2,.stars-3');
   const rocket = document.getElementById('rocket');
-  const bigMeteor = document.getElementById('big-meteor');
   const cartoonStar = document.getElementById('cartoon-star');
   const planetFooter = document.getElementById('planet-footer');
   let smoothVel = 0, prevScroll = window.scrollY;
@@ -1158,7 +1115,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Generate meteorites
   const meteorsBox = document.getElementById('meteors');
   const meteorData = [];
-  const METEOR_COUNT = 10;
+  const METEOR_COUNT = 6;
   for (let i = 0; i < METEOR_COUNT; i++) {
     const el = document.createElement('div');
     el.className = 'meteor';
@@ -1173,91 +1130,69 @@ document.addEventListener('DOMContentLoaded', () => {
     el.style.setProperty('--w', (2 + scale * 2) + 'px');
     el.style.setProperty('--head', (3 + scale * 4) + 'px');
     el.style.left = x + '%';
-    meteorData.push({ el, scrollStart, scrollSpan, angle, scale, drift });
+    meteorData.push({ el, scrollStart, scrollSpan, angle, scale, drift, vis: false, left: x });
     meteorsBox.appendChild(el);
   }
 
+  // Cache layout values (updated on resize)
+  let cachedVW = window.innerWidth, cachedVH = window.innerHeight;
+  let cachedScrollMax = document.documentElement.scrollHeight - cachedVH;
+  window.addEventListener('resize', () => {
+    cachedVW = window.innerWidth;
+    cachedVH = window.innerHeight;
+    cachedScrollMax = document.documentElement.scrollHeight - cachedVH;
+  }, { passive: true });
+  let lastScrollRatio = -1;
+
   // SINGLE rAF loop for stars + rocket (exported to window for 3D script to merge)
   window._ambientTick = function() {
-    // Scroll velocity (compare positions, not events)
     const curScroll = window.scrollY;
     const delta = Math.abs(curScroll - prevScroll);
     prevScroll = curScroll;
     const rawVel = delta > 0 ? Math.min(delta / 16, 5) : 0;
-
     const attack = rawVel > smoothVel ? 0.15 : 0.04;
     smoothVel += (rawVel - smoothVel) * attack;
     if (smoothVel < 0.001) smoothVel = 0;
 
-    // Star parallax + warp (only update if values changed meaningfully)
+    // Star parallax + warp
     const warp = Math.min(smoothVel * 8, 12);
     for (let i = 0; i < 3; i++) {
-      const depth = i + 1;
-      const px = mouseX * depth * 6;
-      const py = mouseY * depth * 6;
-      const stretch = 1 + warp * depth * 0.35;
-      starLayers[i].style.transform = `translate(${px}px,${py}px) scaleY(${stretch})`;
+      const d = i + 1;
+      starLayers[i].style.transform = `translate(${mouseX*d*6}px,${mouseY*d*6}px) scaleY(${1+warp*d*0.35})`;
     }
 
-    // Meteorites: scroll-driven falling
-    const scrollMax = document.documentElement.scrollHeight - window.innerHeight;
-    const scrollRatio = scrollMax > 0 ? curScroll / scrollMax : 0;
-    const vh = window.innerHeight;
+    // Scroll-driven objects: skip all work if scroll unchanged and no velocity
+    const scrollRatio = cachedScrollMax > 0 ? curScroll / cachedScrollMax : 0;
+    if (scrollRatio === lastScrollRatio && smoothVel === 0) return;
+    lastScrollRatio = scrollRatio;
+    const vh = cachedVH, vw = cachedVW;
+
+    // Meteorites (single cssText write per element)
     for (let i = 0; i < meteorData.length; i++) {
       const m = meteorData[i];
       const p = (scrollRatio - m.scrollStart) / m.scrollSpan;
       if (p < -0.02 || p > 1.05) {
-        if (m.el.style.opacity !== '0') m.el.style.opacity = '0';
+        if (m.vis) { m.el.style.cssText = `left:${m.left}%;opacity:0`; m.vis = false; }
         continue;
       }
       const y = -120 + p * (vh + 200);
-      const xOff = m.drift * p;
       const fade = p < 0.08 ? p / 0.08 : p > 0.92 ? (1 - p) / 0.08 : 1;
-      m.el.style.opacity = fade;
-      m.el.style.transform = `translate(${xOff}px,${y}px) rotate(${m.angle}deg) scale(${m.scale})`;
+      m.el.style.cssText = `left:${m.left}%;opacity:${fade};transform:translate(${m.drift*p}px,${y}px) rotate(${m.angle}deg) scale(${m.scale})`;
+      m.vis = true;
     }
 
-    // Big meteorite: diagonal close pass from upper-left to lower-right (15%-50% scroll)
-    const bmStart = 0.15, bmEnd = 0.50;
-    if (bigMeteor) {
-      const bmp = (scrollRatio - bmStart) / (bmEnd - bmStart);
-      if (bmp > -0.02 && bmp < 1.05) {
-        const vw = window.innerWidth;
-        const bx = vw * 0.1 + bmp * (vw * 0.75);    // left to right
-        const by = -200 + bmp * (vh + 300);           // top to bottom
-        const bsc = 0.4 + bmp * 1.8;                  // 0.4x → 2.2x (close pass!)
-        const bfade = bmp < 0.06 ? bmp / 0.06 : bmp > 0.9 ? (1 - bmp) / 0.1 : 1;
-        const bAngle = 25 + bmp * 10;                 // tilted right (falling left-to-right)
-        bigMeteor.style.opacity = bfade;
-        bigMeteor.style.transform = `translate(${bx}px,${by}px) rotate(${bAngle}deg) scale(${bsc})`;
-      } else {
-        if (bigMeteor.style.opacity !== '0') bigMeteor.style.opacity = '0';
-      }
-    }
-
-    // Cartoon star: elliptical trajectory from lower-left to upper-right with wobble (5%-45% scroll)
-    const csStart = 0.05, csEnd = 0.45;
+    // Cartoon star: elliptical trajectory (5%-45% scroll)
     if (cartoonStar) {
-      const csp = (scrollRatio - csStart) / (csEnd - csStart);
+      const csp = (scrollRatio - 0.05) / 0.4;
       if (csp > -0.02 && csp < 1.05) {
-        const vw = window.innerWidth;
-        const PI = 3.14159;
-        // Ellipse: sweep from ~240° (lower-left) to ~20° (upper-right)
-        const sA = PI * 1.33, eA = PI * 0.11;
+        const sA = 4.17689, eA = 0.34558; // PI*1.33, PI*0.11
         const th = sA + (eA - sA) * csp;
-        const eCx = vw * 0.5, eCy = vh * 0.45;
-        const eRx = vw * 0.45 + 60, eRy = vh * 0.4 + 30;
-        const sx = eCx + eRx * Math.cos(th);
-        const sy = eCy - eRy * Math.sin(th);
-        const wobbleX = Math.sin(csp * 14) * 12;
-        const wobbleY = Math.cos(csp * 10) * 8;
-        const spin = csp * 400;
-        const csc = 0.5 + csp * 0.6;
+        const sx = vw * 0.5 + (vw * 0.45 + 60) * Math.cos(th) + Math.sin(csp * 14) * 12;
+        const sy = vh * 0.45 - (vh * 0.4 + 30) * Math.sin(th) + Math.cos(csp * 10) * 8;
         const cfade = csp < 0.08 ? csp / 0.08 : csp > 0.88 ? (1 - csp) / 0.12 : 1;
-        cartoonStar.style.opacity = cfade;
-        cartoonStar.style.transform = `translate(${sx + wobbleX}px,${sy + wobbleY}px) rotate(${spin}deg) scale(${csc})`;
+        cartoonStar.style.cssText = `opacity:${cfade};transform:translate(${sx}px,${sy}px) rotate(${csp*400}deg) scale(${0.5+csp*0.6})`;
       } else {
-        if (cartoonStar.style.opacity !== '0') cartoonStar.style.opacity = '0';
+        if (cartoonStar.style.opacity !== '0') cartoonStar.style.cssText = 'opacity:0';
       }
     }
 
@@ -1304,18 +1239,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Planet footer: rises from bottom in last 25% of scroll
     if (planetFooter) {
-      const plStart = 0.75;
-      if (scrollRatio > plStart) {
-        const plp = (scrollRatio - plStart) / (1 - plStart); // 0..1
-        const rise = plp * 100; // 0% → 100% of its height visible
-        const fade = Math.min(plp / 0.15, 1);
-        planetFooter.style.opacity = fade;
-        planetFooter.style.transform = `translateY(${100 - rise}%)`;
-      } else {
-        if (planetFooter.style.opacity !== '0') {
-          planetFooter.style.opacity = '0';
-          planetFooter.style.transform = 'translateY(100%)';
-        }
+      if (scrollRatio > 0.75) {
+        const plp = (scrollRatio - 0.75) * 4;
+        planetFooter.style.cssText = `opacity:${Math.min(plp/0.15,1)};transform:translateY(${100-plp*100}%)`;
+      } else if (planetFooter.style.opacity !== '0') {
+        planetFooter.style.cssText = 'opacity:0;transform:translateY(100%)';
       }
     }
   };
