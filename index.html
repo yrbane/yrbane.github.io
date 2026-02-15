@@ -563,6 +563,43 @@
   .rocket svg .flame1 { animation-duration: .12s; }
   .rocket svg .flame2 { animation-duration: .1s; animation-delay: .05s; }
   .rocket svg .flame3 { animation-duration: .14s; animation-delay: .08s; }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     METEORITES
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .meteors {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .meteor {
+    position: absolute;
+    top: 0; left: 0;
+    width: var(--w, 3px);
+    height: var(--trail, 60px);
+    opacity: 0;
+    will-change: transform;
+    contain: layout style;
+    background: linear-gradient(to bottom,
+      transparent 0%,
+      rgba(255,180,80,.04) 10%,
+      rgba(255,160,60,.25) 50%,
+      rgba(255,200,100,.7) 88%,
+      #fff 100%
+    );
+    border-radius: 1px;
+  }
+  .meteor::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 50%;
+    width: var(--head, 5px); height: var(--head, 5px);
+    transform: translateX(-50%);
+    background: radial-gradient(circle, #fff 10%, #ffcc66 35%, #ff8833 65%, transparent 100%);
+    border-radius: 50%;
+  }
 </style>
 </head>
 <body>
@@ -847,6 +884,9 @@
   </svg>
 </div>
 
+<!-- Meteorites container (populated by JS) -->
+<div class="meteors" id="meteors"></div>
+
 <!-- ═════════════════════════════════════════════════════════════════════════
      FOOTER
      ═══════════════════════════════════════════════════════════════════════ -->
@@ -913,6 +953,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const rocket = document.getElementById('rocket');
   let smoothVel = 0, prevScroll = window.scrollY;
 
+  // Generate meteorites
+  const meteorsBox = document.getElementById('meteors');
+  const meteorData = [];
+  const METEOR_COUNT = 10;
+  for (let i = 0; i < METEOR_COUNT; i++) {
+    const el = document.createElement('div');
+    el.className = 'meteor';
+    const x = 5 + Math.random() * 90;           // 5-95% horizontal
+    const scrollStart = Math.random() * 0.65;    // when it starts (0-65% of scroll)
+    const scrollSpan = 0.25 + Math.random() * 0.2; // how long it takes to cross (25-45%)
+    const angle = -30 + Math.random() * 20;      // tilt (-30° to -10°)
+    const scale = 0.5 + Math.random() * 0.8;     // size 0.5x-1.3x
+    const trail = 40 + Math.random() * 70;       // trail length 40-110px
+    const drift = -40 + Math.random() * 80;      // horizontal drift during fall
+    el.style.setProperty('--trail', trail + 'px');
+    el.style.setProperty('--w', (2 + scale * 2) + 'px');
+    el.style.setProperty('--head', (3 + scale * 4) + 'px');
+    el.style.left = x + '%';
+    meteorData.push({ el, scrollStart, scrollSpan, angle, scale, drift });
+    meteorsBox.appendChild(el);
+  }
+
   // SINGLE rAF loop for stars + rocket (exported to window for 3D script to merge)
   window._ambientTick = function() {
     // Scroll velocity (compare positions, not events)
@@ -935,10 +997,26 @@ document.addEventListener('DOMContentLoaded', () => {
       starLayers[i].style.transform = `translate(${px}px,${py}px) scaleY(${stretch})`;
     }
 
-    // Rocket: elliptical trajectory, tangent orientation, gradual growth
-    // Active in last 50% of scroll for slower traversal
+    // Meteorites: scroll-driven falling
     const scrollMax = document.documentElement.scrollHeight - window.innerHeight;
     const scrollRatio = scrollMax > 0 ? curScroll / scrollMax : 0;
+    const vh = window.innerHeight;
+    for (let i = 0; i < meteorData.length; i++) {
+      const m = meteorData[i];
+      const p = (scrollRatio - m.scrollStart) / m.scrollSpan;
+      if (p < -0.02 || p > 1.05) {
+        if (m.el.style.opacity !== '0') m.el.style.opacity = '0';
+        continue;
+      }
+      const y = -120 + p * (vh + 200);
+      const xOff = m.drift * p;
+      const fade = p < 0.08 ? p / 0.08 : p > 0.92 ? (1 - p) / 0.08 : 1;
+      m.el.style.opacity = fade;
+      m.el.style.transform = `translate(${xOff}px,${y}px) rotate(${m.angle}deg) scale(${m.scale})`;
+    }
+
+    // Rocket: elliptical trajectory, tangent orientation, gradual growth
+    // Active in last 50% of scroll for slower traversal
     const rStart = 0.50;
     if (scrollRatio > rStart && rocket) {
       const p = (scrollRatio - rStart) / (1 - rStart); // 0..1
