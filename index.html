@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>yrbane &mdash; Projects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://avatars.githubusercontent.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap"></noscript>
 <style>
   /* ═══════════════════════════════════════════════════════════════════════════
      RESET & BASE
@@ -28,8 +33,6 @@
     --font:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --mono:      'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
   }
-
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
   html { scroll-behavior: auto; }
 
@@ -69,6 +72,7 @@
   /* Starfield layers (3 depth planes for parallax) */
   .stars {
     position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    contain: strict;
   }
   .stars-1, .stars-2, .stars-3 {
     position: absolute; inset: -60px;
@@ -663,7 +667,7 @@
 <section class="hero">
   <canvas id="webgl-geo"></canvas>
   <div class="container">
-    <img class="hero-avatar animate-in" src="https://avatars.githubusercontent.com/u/143083313?v=4" alt="yrbane">
+    <img class="hero-avatar animate-in" src="https://avatars.githubusercontent.com/u/143083313?v=4&s=200" alt="yrbane" width="100" height="100" decoding="async">
 
     <div class="hero-badge animate-in delay-1">
       <span class="dot"></span>
@@ -961,220 +965,187 @@
 </footer>
 
 <!-- ═════════════════════════════════════════════════════════════════════════
-     SCROLL ANIMATIONS
-     ═════════════════════════════════════════════════════════════════════════ -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const els = document.querySelectorAll(
-    '.featured-card, .project-card, .tech-badge'
-  );
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        const el = entry.target;
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = `opacity .6s ease ${i * 50}ms, transform .6s ease ${i * 50}ms`;
-        requestAnimationFrame(() => {
-          el.style.opacity = '1';
-          el.style.transform = 'translateY(0)';
-        });
-        observer.unobserve(el);
-      }
-    });
-  }, { threshold: 0.08 });
-
-  els.forEach(el => observer.observe(el));
-
-  // Clean up finished intro animations (free compositor layers)
-  document.querySelectorAll('.animate-in').forEach(el => {
-    el.addEventListener('animationend', () => {
-      el.classList.remove('animate-in');
-      el.classList.add('animate-done');
-    }, { once: true });
-  });
-
-  // Mouse tracking (only store values, no DOM updates in handler)
-  let mouseX = 0, mouseY = 0;
-  document.addEventListener('mousemove', (e) => {
-    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-  });
-
-  // Scroll velocity tracking
-  let scrollVel = 0;
-  window.addEventListener('scroll', () => {
-    scrollVel = 1; // flag: scrolling happened this frame
-  }, { passive: true });
-
-  // Cache DOM refs
-  const starLayers = document.querySelectorAll('.stars-1,.stars-2,.stars-3');
-  const rocket = document.getElementById('rocket');
-  const cartoonStar = document.getElementById('cartoon-star');
-  const planetFooter = document.getElementById('planet-footer');
-  let smoothVel = 0, prevScroll = window.scrollY;
-
-  // Generate meteorites
-  const meteorsBox = document.getElementById('meteors');
-  const meteorData = [];
-  const METEOR_COUNT = 6;
-  for (let i = 0; i < METEOR_COUNT; i++) {
-    const el = document.createElement('div');
-    el.className = 'meteor';
-    const x = 5 + Math.random() * 90;           // 5-95% horizontal
-    const scrollStart = Math.random() * 0.65;    // when it starts (0-65% of scroll)
-    const scrollSpan = 0.25 + Math.random() * 0.2; // how long it takes to cross (25-45%)
-    const angle = -30 + Math.random() * 20;      // tilt (-30° to -10°)
-    const scale = 0.5 + Math.random() * 0.8;     // size 0.5x-1.3x
-    const trail = 40 + Math.random() * 70;       // trail length 40-110px
-    const drift = -40 + Math.random() * 80;      // horizontal drift during fall
-    el.style.setProperty('--trail', trail + 'px');
-    el.style.setProperty('--w', (2 + scale * 2) + 'px');
-    el.style.setProperty('--head', (3 + scale * 4) + 'px');
-    el.style.left = x + '%';
-    meteorData.push({ el, scrollStart, scrollSpan, angle, scale, drift, vis: false, left: x });
-    meteorsBox.appendChild(el);
-  }
-
-  // Cache layout values (updated on resize)
-  let cachedVW = window.innerWidth, cachedVH = window.innerHeight;
-  let cachedScrollMax = document.documentElement.scrollHeight - cachedVH;
-  window.addEventListener('resize', () => {
-    cachedVW = window.innerWidth;
-    cachedVH = window.innerHeight;
-    cachedScrollMax = document.documentElement.scrollHeight - cachedVH;
-  }, { passive: true });
-  let lastScrollRatio = -1;
-
-  // SINGLE rAF loop for stars + rocket (exported to window for 3D script to merge)
-  window._ambientTick = function() {
-    const curScroll = window.scrollY;
-    const delta = Math.abs(curScroll - prevScroll);
-    prevScroll = curScroll;
-    const rawVel = delta > 0 ? Math.min(delta / 16, 5) : 0;
-    const attack = rawVel > smoothVel ? 0.15 : 0.04;
-    smoothVel += (rawVel - smoothVel) * attack;
-    if (smoothVel < 0.001) smoothVel = 0;
-
-    // Star parallax + warp
-    const warp = Math.min(smoothVel * 8, 12);
-    for (let i = 0; i < 3; i++) {
-      const d = i + 1;
-      starLayers[i].style.transform = `translate(${mouseX*d*6}px,${mouseY*d*6}px) scaleY(${1+warp*d*0.35})`;
-    }
-
-    // Scroll-driven objects: skip all work if scroll unchanged and no velocity
-    const scrollRatio = cachedScrollMax > 0 ? curScroll / cachedScrollMax : 0;
-    if (scrollRatio === lastScrollRatio && smoothVel === 0) return;
-    lastScrollRatio = scrollRatio;
-    const vh = cachedVH, vw = cachedVW;
-
-    // Meteorites (single cssText write per element)
-    for (let i = 0; i < meteorData.length; i++) {
-      const m = meteorData[i];
-      const p = (scrollRatio - m.scrollStart) / m.scrollSpan;
-      if (p < -0.02 || p > 1.05) {
-        if (m.vis) { m.el.style.cssText = `left:${m.left}%;opacity:0`; m.vis = false; }
-        continue;
-      }
-      const y = -120 + p * (vh + 200);
-      const fade = p < 0.08 ? p / 0.08 : p > 0.92 ? (1 - p) / 0.08 : 1;
-      m.el.style.cssText = `left:${m.left}%;opacity:${fade};transform:translate(${m.drift*p}px,${y}px) rotate(${m.angle}deg) scale(${m.scale})`;
-      m.vis = true;
-    }
-
-    // Cartoon star: elliptical trajectory (5%-45% scroll)
-    if (cartoonStar) {
-      const csp = (scrollRatio - 0.05) / 0.4;
-      if (csp > -0.02 && csp < 1.05) {
-        const sA = 4.17689, eA = 0.34558; // PI*1.33, PI*0.11
-        const th = sA + (eA - sA) * csp;
-        const sx = vw * 0.5 + (vw * 0.45 + 60) * Math.cos(th) + Math.sin(csp * 14) * 12;
-        const sy = vh * 0.45 - (vh * 0.4 + 30) * Math.sin(th) + Math.cos(csp * 10) * 8;
-        const cfade = csp < 0.08 ? csp / 0.08 : csp > 0.88 ? (1 - csp) / 0.12 : 1;
-        cartoonStar.style.cssText = `opacity:${cfade};transform:translate(${sx}px,${sy}px) rotate(${csp*400}deg) scale(${0.5+csp*0.6})`;
-      } else {
-        if (cartoonStar.style.opacity !== '0') cartoonStar.style.cssText = 'opacity:0';
-      }
-    }
-
-    // Rocket: elliptical trajectory, tangent orientation, gradual growth
-    // Active in last 50% of scroll for slower traversal
-    const rStart = 0.50;
-    if (scrollRatio > rStart && rocket) {
-      const p = (scrollRatio - rStart) / (1 - rStart); // 0..1
-      const vw = window.innerWidth, vh = window.innerHeight;
-      const PI = 3.14159;
-
-      // Ellipse: sweep from ~210° to ~30° (bottom-left to top-right)
-      const startAngle = PI * 1.17;  // ~210°
-      const endAngle   = PI * 0.17;  // ~30°
-      const theta = startAngle + (endAngle - startAngle) * p;
-
-      // Ellipse center and radii (center pushed down for lower flight path)
-      const cx = vw * 0.5, cy = vh * 0.65;
-      const rx = vw * 0.55 + 80;   // horizontal radius
-      const ry = vh * 0.45 + 40;   // vertical radius
-
-      const x = cx + rx * Math.cos(theta);
-      const y = cy - ry * Math.sin(theta);
-
-      // Tangent direction for orientation (derivative of ellipse)
-      const dx = -rx * Math.sin(theta) * (endAngle - startAngle);
-      const dy = -ry * Math.cos(theta) * (endAngle - startAngle);
-      const angle = Math.atan2(dy, dx) * (180 / PI);
-      const tilt = angle + 90; // +90 because SVG nose points up
-
-      // Scale: grows from 0.3 to 2.1 (very strong approaching effect)
-      const sc = 0.3 + p * 1.8;
-
-      // Fade in/out
-      const fade = p < 0.08 ? p / 0.08 : p > 0.88 ? (1 - p) / 0.12 : 1;
-
-      if (!rocket.classList.contains('flying')) rocket.classList.add('flying');
-      rocket.style.cssText = `left:${x}px;top:${y}px;bottom:auto;opacity:${fade};` +
-        `transform:rotate(${tilt}deg) scale(${sc})`;
-    } else if (rocket) {
-      if (rocket.classList.contains('flying')) rocket.classList.remove('flying');
-      if (rocket.style.opacity !== '0') rocket.style.opacity = '0';
-    }
-
-    // Planet footer (Mars photo): rises from bottom in last 25% of scroll
-    // The circle is 140vw wide, centered. At plp=1 show top ~18% (25vh worth)
-    if (planetFooter) {
-      if (scrollRatio > 0.75) {
-        const plp = (scrollRatio - 0.75) * 4; // 0→1
-        const rise = plp * 25; // max 25vh visible
-        const fade = Math.min(plp / 0.15, 1);
-        planetFooter.style.cssText = `opacity:${fade};transform:translateX(-50%) translateY(calc(100% - ${rise}vh))`;
-      } else if (planetFooter.style.opacity !== '0') {
-        planetFooter.style.cssText = 'opacity:0;transform:translateX(-50%) translateY(100%)';
-      }
-    }
-  };
-});
-</script>
-<!-- ═════════════════════════════════════════════════════════════════════════
-     3D GEOMETRY (Canvas 2D with manual projection)
+     UNIFIED SCRIPT — scroll animations, ambient effects, 3D geometry
      ═════════════════════════════════════════════════════════════════════════ -->
 <script>
 (function(){
+  /* ═══════ SHARED STATE ═══════ */
+  var mx=0,my=0;
+  var vw=window.innerWidth,vh=window.innerHeight;
+  var scrollMax=0;
+  var needResize=false;
+  /* Defer scrollMax read to after layout settles */
+  requestAnimationFrame(function(){scrollMax=document.documentElement.scrollHeight-vh;});
+
+  /* Single mousemove (uses cached vw/vh — no layout read) */
+  document.addEventListener('mousemove',function(e){
+    mx=(e.clientX/vw-.5)*2;
+    my=(e.clientY/vh-.5)*2;
+  });
+
+  /* Single resize handler */
+  window.addEventListener('resize',function(){
+    vw=window.innerWidth;vh=window.innerHeight;
+    scrollMax=document.documentElement.scrollHeight-vh;
+    needResize=true;
+  },{passive:true});
+
+  /* ═══════ SCROLL REVEAL (IntersectionObserver — fire once) ═══════ */
+  var els=document.querySelectorAll('.featured-card,.project-card,.tech-badge');
+  var revealObs=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry,i){
+      if(entry.isIntersecting){
+        var el=entry.target;
+        el.style.cssText+='opacity:0;transform:translateY(20px);transition:opacity .6s ease '+i*50+'ms,transform .6s ease '+i*50+'ms';
+        requestAnimationFrame(function(){requestAnimationFrame(function(){el.style.opacity='1';el.style.transform='translateY(0)';});});
+        revealObs.unobserve(el);
+      }
+    });
+  },{threshold:0.08});
+  for(var ri=0;ri<els.length;ri++)revealObs.observe(els[ri]);
+
+  /* Clean up intro animations (free compositor layers) */
+  var anims=document.querySelectorAll('.animate-in');
+  for(var ai=0;ai<anims.length;ai++){
+    anims[ai].addEventListener('animationend',function(){
+      this.classList.remove('animate-in');this.classList.add('animate-done');
+    },{once:true});
+  }
+
+  /* ═══════ AMBIENT EFFECTS — DOM refs & meteor setup ═══════ */
+  var starLayers=[
+    document.querySelector('.stars-1'),
+    document.querySelector('.stars-2'),
+    document.querySelector('.stars-3')
+  ];
+  var rocket=document.getElementById('rocket');
+  var cartoonStar=document.getElementById('cartoon-star');
+  var planetFooter=document.getElementById('planet-footer');
+  var smoothVel=0,prevScroll=window.scrollY;
+  var lastScrollRatio=-1;
+  var rocketFlying=false,planetVis=false;
+
+  /* Pre-computed constants */
+  var PI=3.14159265,DEG=180/PI;
+  var R_START_A=PI*1.17,R_END_A=PI*0.17,R_SWEEP=R_END_A-R_START_A;
+  var S_START_A=4.17689,S_END_A=0.34558,S_SWEEP=S_END_A-S_START_A;
+
+  /* Generate meteorites */
+  var meteorsBox=document.getElementById('meteors');
+  var meteorData=[];
+  for(var mi=0;mi<6;mi++){
+    var mel=document.createElement('div');mel.className='meteor';
+    var mLeft=5+Math.random()*90;
+    var mScale=.5+Math.random()*.8;
+    var mTrail=40+Math.random()*70;
+    var mBase='--trail:'+mTrail+'px;--w:'+(2+mScale*2)+'px;--head:'+(3+mScale*4)+'px;left:'+mLeft+'%;';
+    mel.style.cssText=mBase;
+    meteorData.push({el:mel,ss:Math.random()*.65,sp:.25+Math.random()*.2,
+      a:-30+Math.random()*20,sc:mScale,dr:-40+Math.random()*80,vis:false,l:mLeft,base:mBase});
+    meteorsBox.appendChild(mel);
+  }
+
+  /* ═══════ AMBIENT TICK (called from rAF) ═══════ */
+  function ambientTick(){
+    var curScroll=window.scrollY;
+    var delta=curScroll-prevScroll;if(delta<0)delta=-delta;
+    prevScroll=curScroll;
+    var rawVel=delta>0?(delta/16>5?5:delta/16):0;
+    smoothVel+=(rawVel-smoothVel)*(rawVel>smoothVel?.15:.04);
+    if(smoothVel<.001)smoothVel=0;
+
+    /* Star parallax + warp */
+    var warp=smoothVel*8;if(warp>12)warp=12;
+    for(var si=0;si<3;si++){
+      var d=si+1;
+      starLayers[si].style.transform='translate('+mx*d*6+'px,'+my*d*6+'px) scaleY('+(1+warp*d*.35)+')';
+    }
+
+    /* Skip scroll-driven work if scroll unchanged and no velocity */
+    var scrollRatio=scrollMax>0?curScroll/scrollMax:0;
+    if(scrollRatio===lastScrollRatio&&smoothVel===0)return;
+    lastScrollRatio=scrollRatio;
+
+    /* Meteorites */
+    for(var i=0;i<6;i++){
+      var m=meteorData[i];
+      var p=(scrollRatio-m.ss)/m.sp;
+      if(p<-.02||p>1.05){
+        if(m.vis){m.el.style.cssText=m.base+'opacity:0';m.vis=false;}
+        continue;
+      }
+      var y=-120+p*(vh+200);
+      var fade=p<.08?p/.08:p>.92?(1-p)/.08:1;
+      m.el.style.cssText=m.base+'opacity:'+fade+';transform:translate('+m.dr*p+'px,'+y+'px) rotate('+m.a+'deg) scale('+m.sc+')';
+      m.vis=true;
+    }
+
+    /* Cartoon star: elliptical (5%–45% scroll) */
+    if(cartoonStar){
+      var csp=(scrollRatio-.05)/.4;
+      if(csp>-.02&&csp<1.05){
+        var th=S_START_A+S_SWEEP*csp;
+        var cosT=Math.cos(th),sinT=Math.sin(th);
+        var sx=vw*.5+(vw*.45+60)*cosT+Math.sin(csp*14)*12;
+        var sy=vh*.45-(vh*.4+30)*sinT+Math.cos(csp*10)*8;
+        var cf=csp<.08?csp/.08:csp>.88?(1-csp)/.12:1;
+        cartoonStar.style.cssText='opacity:'+cf+';transform:translate('+sx+'px,'+sy+'px) rotate('+csp*400+'deg) scale('+(.5+csp*.6)+')';
+      }else if(cartoonStar.style.opacity!=='0'){
+        cartoonStar.style.cssText='opacity:0';
+      }
+    }
+
+    /* Rocket: elliptical trajectory (50%–100% scroll) */
+    if(rocket){
+      if(scrollRatio>.5){
+        var rp=(scrollRatio-.5)*2;
+        var theta=R_START_A+R_SWEEP*rp;
+        var cosR=Math.cos(theta),sinR=Math.sin(theta);
+        var rcx=vw*.5,rcy=vh*.65;
+        var rrx=vw*.55+80,rry=vh*.45+40;
+        var rx=rcx+rrx*cosR,ry=rcy-rry*sinR;
+        var tdx=-rrx*sinR*R_SWEEP,tdy=-rry*cosR*R_SWEEP;
+        var tilt=Math.atan2(tdy,tdx)*DEG+90;
+        var rsc=.3+rp*1.8;
+        var rfade=rp<.08?rp/.08:rp>.88?(1-rp)/.12:1;
+        if(!rocketFlying){rocket.classList.add('flying');rocketFlying=true;}
+        rocket.style.cssText='left:'+rx+'px;top:'+ry+'px;bottom:auto;opacity:'+rfade+';transform:rotate('+tilt+'deg) scale('+rsc+')';
+      }else{
+        if(rocketFlying){rocket.classList.remove('flying');rocketFlying=false;}
+        if(rocket.style.opacity!=='0')rocket.style.opacity='0';
+      }
+    }
+
+    /* Planet footer (Mars): rises in last 25% */
+    if(planetFooter){
+      if(scrollRatio>.75){
+        var plp=(scrollRatio-.75)*4;
+        var rise=plp*25;
+        var pf=plp/.15;if(pf>1)pf=1;
+        planetFooter.style.cssText='opacity:'+pf+';transform:translateX(-50%) translateY(calc(100% - '+rise+'vh))';
+        planetVis=true;
+      }else if(planetVis){
+        planetFooter.style.cssText='opacity:0;transform:translateX(-50%) translateY(100%)';
+        planetVis=false;
+      }
+    }
+  }
+
+  /* ═══════ 3D GEOMETRY (Canvas 2D wireframe) ═══════ */
   var c=document.getElementById('webgl-geo');
   if(!c)return;
   var ctx=c.getContext('2d');
   if(!ctx)return;
 
   var DPR=1;
-  function resize(){
-    DPR=1;
+  function canvasResize(){
     var w=c.clientWidth,h=c.clientHeight;
     var nw=Math.round(w*DPR),nh=Math.round(h*DPR);
     if(c.width!==nw||c.height!==nh){c.width=nw;c.height=nh;}
   }
-  resize();
-  window.addEventListener('resize',resize);
+  canvasResize();
 
-  /* --- geometry --- */
+  /* Geometry */
   var phi=(1+Math.sqrt(5))/2;
   var icoV=[[-1,phi,0],[1,phi,0],[-1,-phi,0],[1,-phi,0],[0,-1,phi],[0,1,phi],[0,-1,-phi],[0,1,-phi],[phi,0,-1],[phi,0,1],[-phi,0,-1],[-phi,0,1]];
   icoV.forEach(function(v){var l=Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);v[0]/=l;v[1]/=l;v[2]/=l;});
@@ -1197,32 +1168,26 @@ document.addEventListener('DOMContentLoaded', () => {
   var octV=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
   var octF=[[0,2,4],[0,4,3],[0,3,5],[0,5,2],[1,2,5],[1,5,3],[1,3,4],[1,4,2]];
 
-  /* --- flatten geometry for cache-friendly access --- */
-  var layers=[
-    {sc:1.5,spd:[.5,.35,.2],mInf:.6,lw:0.6,la:.1,col:'108,99,255',pa:.25,pr:1.5},
-    {sc:.8,spd:[-.8,-.55,-.35],mInf:.7,lw:1.2,la:.25,col:'0,212,170',pa:.5,pr:2.5},
-    {sc:.35,spd:[1.3,.9,.7],mInf:.9,lw:1.8,la:.45,col:'255,107,107',pa:.7,pr:4}
+  /* Flatten geometry + pre-compute stroke styles */
+  var gLayers=[
+    {sc:1.5,spd:[.5,.35,.2],mInf:.6,lw:.6,stroke:'rgba(108,99,255,.1)',pa:.25,pr:1.5,col:'108,99,255'},
+    {sc:.8,spd:[-.8,-.55,-.35],mInf:.7,lw:1.2,stroke:'rgba(0,212,170,.25)',pa:.5,pr:2.5,col:'0,212,170'},
+    {sc:.35,spd:[1.3,.9,.7],mInf:.9,lw:1.8,stroke:'rgba(255,107,107,.45)',pa:.7,pr:4,col:'255,107,107'}
   ];
-  var geoSets=[
-    {v:s1.v,e:getEdges(s1.f)},
-    {v:icoV,e:getEdges(icoF)},
-    {v:octV,e:getEdges(octF)}
-  ];
+  var geoSets=[{v:s1.v,e:getEdges(s1.f)},{v:icoV,e:getEdges(icoF)},{v:octV,e:getEdges(octF)}];
 
-  /* pre-flatten vertices into Float64Arrays, edges into flat Uint16Arrays */
   for(var li=0;li<3;li++){
     var g=geoSets[li],nv=g.v.length,ne=g.e.length;
     var fv=new Float64Array(nv*3);
     for(var i=0;i<nv;i++){fv[i*3]=g.v[i][0];fv[i*3+1]=g.v[i][1];fv[i*3+2]=g.v[i][2];}
     var fe=new Uint16Array(ne*2);
     for(var i=0;i<ne;i++){fe[i*2]=g.e[i][0];fe[i*2+1]=g.e[i][1];}
-    layers[li].fv=fv;layers[li].fe=fe;layers[li].nv=nv;layers[li].ne=ne;
-    /* pre-allocate projection buffer: x,y per vertex */
-    layers[li].proj=new Float64Array(nv*2);
+    gLayers[li].fv=fv;gLayers[li].fe=fe;gLayers[li].nv=nv;gLayers[li].ne=ne;
+    gLayers[li].proj=new Float64Array(nv*2);
   }
 
-  /* --- pre-render glow sprites (offscreen canvas per layer) --- */
-  function makeGlowSprite(col,alpha,radius){
+  /* Glow sprites (offscreen canvases) */
+  function makeGlow(col,alpha,radius){
     var sz=Math.ceil(radius*2)|0;if(sz<2)sz=2;
     var oc=document.createElement('canvas');oc.width=sz;oc.height=sz;
     var ox=oc.getContext('2d');
@@ -1235,82 +1200,63 @@ document.addEventListener('DOMContentLoaded', () => {
   var sprites=[];
   function rebuildSprites(){
     sprites=[];
-    for(var i=0;i<3;i++){
-      var L=layers[i],r=L.pr*DPR*2.5;
-      sprites[i]=makeGlowSprite(L.col,L.pa,r);
-    }
+    for(var i=0;i<3;i++){var L=gLayers[i];sprites[i]=makeGlow(L.col,L.pa,L.pr*DPR*2.5);}
   }
   rebuildSprites();
 
-  /* --- 3D math (inlined rotation, no intermediate arrays) --- */
-  var R=new Float64Array(9); /* shared rotation matrix */
+  /* Rotation matrix (shared Float64Array) */
+  var R=new Float64Array(9);
   function buildRot(ay,ax,az){
     var cy=Math.cos(ay),sy=Math.sin(ay),cx=Math.cos(ax),sx=Math.sin(ax),cz=Math.cos(az),sz=Math.sin(az);
-    /* Rz * Rx * Ry  (composed analytically to avoid 2 m3mul calls) */
-    R[0]=cz*cy+sz*sx*sy; R[1]=sz*cx; R[2]=-cz*sy+sz*sx*cy;
-    R[3]=-sz*cy+cz*sx*sy;R[4]=cz*cx; R[5]=sz*sy+cz*sx*cy;
-    R[6]=cx*sy;           R[7]=-sx;   R[8]=cx*cy;
+    R[0]=cz*cy+sz*sx*sy;R[1]=sz*cx;R[2]=-cz*sy+sz*sx*cy;
+    R[3]=-sz*cy+cz*sx*sy;R[4]=cz*cx;R[5]=sz*sy+cz*sx*cy;
+    R[6]=cx*sy;R[7]=-sx;R[8]=cx*cy;
   }
 
-  /* --- mouse --- */
-  var mx=0,my=0,smx=0,smy=0;
-  document.addEventListener('mousemove',function(e){
-    mx=(e.clientX/window.innerWidth-.5)*2;
-    my=(e.clientY/window.innerHeight-.5)*2;
-  });
+  /* Smooth mouse for 3D (lerp) */
+  var smx=0,smy=0;
 
-  /* resize only on event, rebuild sprites when DPR changes */
-  var needResize=false;
-  window.addEventListener('resize',function(){needResize=true;});
+  /* Visibility (pause canvas when hero off-screen) */
+  var geoVisible=true;
+  new IntersectionObserver(function(entries){geoVisible=entries[0].isIntersecting;},{threshold:0}).observe(c);
 
-  /* --- visibility: pause when hero is off-screen --- */
-  var visible=true;
-  var visObs=new IntersectionObserver(function(entries){
-    visible=entries[0].isIntersecting;
-  },{threshold:0});
-  visObs.observe(c);
-
-  /* --- render loop (SINGLE rAF for entire page) --- */
+  /* ═══════ SINGLE rAF LOOP ═══════ */
   var t=0,lastT=0;
   function draw(now){
     requestAnimationFrame(draw);
-    // Always tick ambient effects (stars, rocket) even when canvas is off-screen
-    if(window._ambientTick)window._ambientTick();
-    if(!visible){lastT=0;return;}
+    ambientTick();
+    if(!geoVisible){lastT=0;return;}
     if(!lastT)lastT=now;
-    t+=(now-lastT)*0.000004;
+    t+=(now-lastT)*.000004;
     lastT=now;
 
-    if(needResize){resize();rebuildSprites();needResize=false;}
+    if(needResize){canvasResize();rebuildSprites();needResize=false;}
 
     smx+=(mx-smx)*.035;
     smy+=(my-smy)*.035;
 
-    var W=c.width,H=c.height,hw=W*0.5,hh=H*0.5;
-    var fov=Math.min(W,H)*0.9;
+    var W=c.width,H=c.height,hw=W*.5,hh=H*.5;
+    var fov=Math.min(W,H)*.9;
     ctx.clearRect(0,0,W,H);
 
     var pulse=1+Math.sin(t*1.5)*.04;
 
     for(var li=0;li<3;li++){
-      var L=layers[li],fv=L.fv,fe=L.fe,nv=L.nv,ne=L.ne,pr=L.proj;
+      var L=gLayers[li],fv=L.fv,fe=L.fe,nv=L.nv,ne=L.ne,pr=L.proj;
       var sc_=L.sc*(li===0?pulse:1);
 
-      /* build combined rotation matrix (single call, no allocs) */
-      buildRot(t*L.spd[0]+smx*L.mInf, t*L.spd[1]+smy*L.mInf, t*L.spd[2]);
+      buildRot(t*L.spd[0]+smx*L.mInf,t*L.spd[1]+smy*L.mInf,t*L.spd[2]);
 
-      /* transform + project all vertices (inline, no temp arrays) */
       for(var i=0,i3=0,i2=0;i<nv;i++,i3+=3,i2+=2){
         var vx=fv[i3],vy=fv[i3+1],vz=fv[i3+2];
         var tz=(R[6]*vx+R[7]*vy+R[8]*vz)*sc_-3.5;
         var f=fov/(-tz);
-        pr[i2]  =hw+(R[0]*vx+R[1]*vy+R[2]*vz)*sc_*f;
+        pr[i2]=hw+(R[0]*vx+R[1]*vy+R[2]*vz)*sc_*f;
         pr[i2+1]=hh-(R[3]*vx+R[4]*vy+R[5]*vz)*sc_*f;
       }
 
-      /* draw edges (single batched path) */
       ctx.lineWidth=L.lw*DPR;
-      ctx.strokeStyle='rgba('+L.col+','+L.la+')';
+      ctx.strokeStyle=L.stroke;
       ctx.beginPath();
       for(var i=0,i2=0;i<ne;i++,i2+=2){
         var ai=fe[i2]<<1,bi=fe[i2+1]<<1;
@@ -1319,9 +1265,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       ctx.stroke();
 
-      /* draw vertices (pre-rendered sprite — skip outer layer, too many tiny dots) */
       if(li>0){
-        var spr=sprites[li],ss=spr.width,sh=ss*0.5;
+        var spr=sprites[li],sh=spr.width*.5;
         for(var i=0,i2=0;i<nv;i++,i2+=2){
           ctx.drawImage(spr,pr[i2]-sh,pr[i2+1]-sh);
         }
