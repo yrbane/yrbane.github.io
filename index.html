@@ -950,8 +950,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const endAngle   = PI * 0.17;  // ~30°
       const theta = startAngle + (endAngle - startAngle) * p;
 
-      // Ellipse center and radii (slightly off-center for natural feel)
-      const cx = vw * 0.5, cy = vh * 0.5;
+      // Ellipse center and radii (center pushed down for lower flight path)
+      const cx = vw * 0.5, cy = vh * 0.65;
       const rx = vw * 0.55 + 80;   // horizontal radius
       const ry = vh * 0.45 + 40;   // vertical radius
 
@@ -964,8 +964,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const angle = Math.atan2(dy, dx) * (180 / PI);
       const tilt = angle + 90; // +90 because SVG nose points up
 
-      // Scale: grows from 0.6 to 1.2 (approaching effect)
-      const sc = 0.6 + p * 0.6;
+      // Scale: grows from 0.4 to 1.6 (strong approaching effect)
+      const sc = 0.4 + p * 1.2;
 
       // Fade in/out
       const fade = p < 0.08 ? p / 0.08 : p > 0.88 ? (1 - p) / 0.12 : 1;
@@ -1102,7 +1102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(draw);
     // Always tick ambient effects (stars, rocket) even when canvas is off-screen
     if(window._ambientTick)window._ambientTick();
-    if(!visible)return;
+    if(!visible){lastT=0;return;}
     if(!lastT)lastT=now;
     t+=(now-lastT)*0.000004;
     lastT=now;
