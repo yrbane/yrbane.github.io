@@ -600,6 +600,33 @@
     background: radial-gradient(circle, #fff 10%, #ffcc66 35%, #ff8833 65%, transparent 100%);
     border-radius: 50%;
   }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     BIG METEORITE (close pass)
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .big-meteor {
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform;
+    contain: layout style;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     CARTOON STAR
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .cartoon-star {
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform;
+    contain: layout style;
+    filter: drop-shadow(0 0 8px rgba(255,230,80,.6));
+  }
 </style>
 </head>
 <body>
@@ -887,6 +914,61 @@
 <!-- Meteorites container (populated by JS) -->
 <div class="meteors" id="meteors"></div>
 
+<!-- Big close-pass meteorite -->
+<div class="big-meteor" id="big-meteor">
+  <svg width="120" height="200" viewBox="0 0 60 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Trail -->
+    <ellipse cx="30" cy="20" rx="8" ry="20" fill="url(#bmTrail1)" opacity=".5"/>
+    <ellipse cx="30" cy="15" rx="5" ry="15" fill="url(#bmTrail2)" opacity=".7"/>
+    <ellipse cx="30" cy="10" rx="3" ry="10" fill="url(#bmTrail3)" opacity=".8"/>
+    <!-- Rocky body -->
+    <ellipse cx="30" cy="62" rx="14" ry="12" fill="#8b7355"/>
+    <ellipse cx="30" cy="61" rx="13" ry="11" fill="#a08060"/>
+    <ellipse cx="27" cy="59" rx="6" ry="5" fill="#b89870" opacity=".6"/>
+    <ellipse cx="34" cy="64" rx="4" ry="3.5" fill="#7a6245" opacity=".7"/>
+    <circle cx="25" cy="63" r="2.5" fill="#6b5540" opacity=".5"/>
+    <circle cx="33" cy="58" r="2" fill="#c4a882" opacity=".4"/>
+    <!-- Glow around rock -->
+    <ellipse cx="30" cy="62" rx="18" ry="16" fill="url(#bmGlow)" opacity=".6"/>
+    <!-- Fire rim -->
+    <ellipse cx="30" cy="55" rx="12" ry="5" fill="url(#bmFire)" opacity=".7"/>
+    <defs>
+      <radialGradient id="bmGlow"><stop offset="40%" stop-color="#ff8833" stop-opacity=".3"/><stop offset="100%" stop-color="#ff8833" stop-opacity="0"/></radialGradient>
+      <linearGradient id="bmTrail1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff8833" stop-opacity="0"/><stop offset="100%" stop-color="#ffaa44" stop-opacity=".4"/></linearGradient>
+      <linearGradient id="bmTrail2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffcc66" stop-opacity="0"/><stop offset="100%" stop-color="#ffcc66" stop-opacity=".6"/></linearGradient>
+      <linearGradient id="bmTrail3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff" stop-opacity="0"/><stop offset="100%" stop-color="#fff" stop-opacity=".8"/></linearGradient>
+      <linearGradient id="bmFire" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffdd66"/><stop offset="100%" stop-color="#ff6622" stop-opacity="0"/></linearGradient>
+    </defs>
+  </svg>
+</div>
+
+<!-- Cartoon star -->
+<div class="cartoon-star" id="cartoon-star">
+  <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Outer glow -->
+    <circle cx="40" cy="40" r="38" fill="url(#starGlow)" opacity=".4"/>
+    <!-- Star body -->
+    <polygon points="40,6 47,28 70,28 52,42 58,64 40,52 22,64 28,42 10,28 33,28"
+      fill="#ffe44d" stroke="#ffcc00" stroke-width="1.5" stroke-linejoin="round"/>
+    <!-- Highlight -->
+    <polygon points="40,14 44,28 54,28 46,36 49,50 40,44 31,50 34,36 26,28 36,28"
+      fill="rgba(255,255,255,.35)"/>
+    <!-- Face: eyes -->
+    <circle cx="34" cy="34" r="2.5" fill="#5a4000"/>
+    <circle cx="46" cy="34" r="2.5" fill="#5a4000"/>
+    <ellipse cx="34.8" cy="33.2" rx="1" ry=".8" fill="#fff" opacity=".7"/>
+    <ellipse cx="46.8" cy="33.2" rx="1" ry=".8" fill="#fff" opacity=".7"/>
+    <!-- Cute smile -->
+    <path d="M34 41 Q40 47 46 41" stroke="#5a4000" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <!-- Rosy cheeks -->
+    <ellipse cx="30" cy="40" rx="3" ry="2" fill="#ffaa88" opacity=".4"/>
+    <ellipse cx="50" cy="40" rx="3" ry="2" fill="#ffaa88" opacity=".4"/>
+    <defs>
+      <radialGradient id="starGlow"><stop offset="0%" stop-color="#ffe44d" stop-opacity=".5"/><stop offset="100%" stop-color="#ffe44d" stop-opacity="0"/></radialGradient>
+    </defs>
+  </svg>
+</div>
+
 <!-- ═════════════════════════════════════════════════════════════════════════
      FOOTER
      ═══════════════════════════════════════════════════════════════════════ -->
@@ -951,6 +1033,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Cache DOM refs
   const starLayers = document.querySelectorAll('.stars-1,.stars-2,.stars-3');
   const rocket = document.getElementById('rocket');
+  const bigMeteor = document.getElementById('big-meteor');
+  const cartoonStar = document.getElementById('cartoon-star');
   let smoothVel = 0, prevScroll = window.scrollY;
 
   // Generate meteorites
@@ -1013,6 +1097,44 @@ document.addEventListener('DOMContentLoaded', () => {
       const fade = p < 0.08 ? p / 0.08 : p > 0.92 ? (1 - p) / 0.08 : 1;
       m.el.style.opacity = fade;
       m.el.style.transform = `translate(${xOff}px,${y}px) rotate(${m.angle}deg) scale(${m.scale})`;
+    }
+
+    // Big meteorite: diagonal close pass from upper-right to lower-left (15%-50% scroll)
+    const bmStart = 0.15, bmEnd = 0.50;
+    if (bigMeteor) {
+      const bmp = (scrollRatio - bmStart) / (bmEnd - bmStart);
+      if (bmp > -0.02 && bmp < 1.05) {
+        const vw = window.innerWidth;
+        const bx = vw * 0.85 - bmp * (vw * 0.8);   // right to left
+        const by = -200 + bmp * (vh + 300);          // top to bottom
+        const bsc = 0.4 + bmp * 1.8;                 // 0.4x → 2.2x (close pass!)
+        const bfade = bmp < 0.06 ? bmp / 0.06 : bmp > 0.9 ? (1 - bmp) / 0.1 : 1;
+        const bAngle = -35 + bmp * 10;               // slight tilt shift during travel
+        bigMeteor.style.opacity = bfade;
+        bigMeteor.style.transform = `translate(${bx}px,${by}px) rotate(${bAngle}deg) scale(${bsc})`;
+      } else {
+        if (bigMeteor.style.opacity !== '0') bigMeteor.style.opacity = '0';
+      }
+    }
+
+    // Cartoon star: floats from lower-right to upper-left with wobble (5%-45% scroll)
+    const csStart = 0.05, csEnd = 0.45;
+    if (cartoonStar) {
+      const csp = (scrollRatio - csStart) / (csEnd - csStart);
+      if (csp > -0.02 && csp < 1.05) {
+        const vw = window.innerWidth;
+        const cx = vw * 0.8 - csp * (vw * 0.7);     // right to left
+        const cy = vh * 0.8 - csp * (vh * 0.9);      // bottom to top
+        const wobbleX = Math.sin(csp * 12) * 15;     // horizontal wobble
+        const wobbleY = Math.cos(csp * 8) * 10;      // vertical wobble
+        const spin = csp * 360;                       // full rotation during travel
+        const csc = 0.6 + csp * 0.5;                 // 0.6x → 1.1x subtle growth
+        const cfade = csp < 0.08 ? csp / 0.08 : csp > 0.88 ? (1 - csp) / 0.12 : 1;
+        cartoonStar.style.opacity = cfade;
+        cartoonStar.style.transform = `translate(${cx + wobbleX}px,${cy + wobbleY}px) rotate(${spin}deg) scale(${csc})`;
+      } else {
+        if (cartoonStar.style.opacity !== '0') cartoonStar.style.opacity = '0';
+      }
     }
 
     // Rocket: elliptical trajectory, tangent orientation, gradual growth
