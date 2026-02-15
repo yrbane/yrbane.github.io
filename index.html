@@ -616,20 +616,18 @@
      ═══════════════════════════════════════════════════════════════════════════ */
   .planet-footer {
     position: fixed;
-    bottom: 0; left: 0;
-    width: 100%;
-    height: 25vh;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    width: 140vw;
+    height: 140vw;
     z-index: 2;
     pointer-events: none;
     opacity: 0;
-    transform: translateY(100%);
-    contain: strict;
-  }
-  .planet-footer svg {
-    position: absolute;
-    bottom: 0; left: 0;
-    width: 100%;
-    height: 100%;
+    contain: layout style;
+    border-radius: 50%;
+    overflow: hidden;
+    background: url('mars.webp') center/cover no-repeat;
+    box-shadow: inset 0 60px 80px -20px rgba(6,6,11,.7), 0 -8px 40px rgba(180,100,40,.15);
   }
 </style>
 </head>
@@ -945,104 +943,8 @@
   </svg>
 </div>
 
-<!-- Planet footer surface -->
-<div class="planet-footer" id="planet-footer">
-  <svg viewBox="0 0 1600 400" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <!-- Planet body gradient -->
-      <linearGradient id="plGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#dcc080"/>
-        <stop offset="15%" stop-color="#c8a868"/>
-        <stop offset="40%" stop-color="#b49458"/>
-        <stop offset="70%" stop-color="#96783e"/>
-        <stop offset="100%" stop-color="#6e5828"/>
-      </linearGradient>
-      <!-- Horizon atmosphere glow -->
-      <linearGradient id="plRim" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#fff0c8" stop-opacity=".6"/>
-        <stop offset="40%" stop-color="#ffe0a0" stop-opacity=".2"/>
-        <stop offset="100%" stop-color="#d4b87a" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-
-    <!-- ══ Planet body: strong spherical arc ══ -->
-    <path d="
-      M-40,260
-      Q80,210 200,170
-      Q350,125 500,95
-      Q650,70 800,60
-      Q950,55 1000,58
-      Q1150,68 1300,95
-      Q1450,128 1550,170
-      Q1620,210 1640,260
-      L1640,410 L-40,410 Z
-    " fill="url(#plGrad)"/>
-    <!-- Atmosphere glow line -->
-    <path d="
-      M-40,260 Q80,210 200,170 Q350,125 500,95 Q650,70 800,60
-      Q950,55 1000,58 Q1150,68 1300,95 Q1450,128 1550,170 Q1620,210 1640,260
-    " fill="none" stroke="url(#plRim)" stroke-width="4"/>
-    <!-- Second subtle inner glow -->
-    <path d="
-      M-40,265 Q80,216 200,176 Q350,132 500,102 Q650,78 800,68
-      Q950,63 1000,66 Q1150,76 1300,102 Q1450,135 1550,176 Q1620,216 1640,265
-    " fill="none" stroke="rgba(255,240,200,.08)" stroke-width="12"/>
-
-    <!-- ══ HUGE CRATER — Tycho-style (center-left) ══ -->
-    <ellipse cx="420" cy="135" rx="110" ry="38" fill="#8a7040" opacity=".55"/>
-    <ellipse cx="420" cy="130" rx="90" ry="28" fill="#9a8050" opacity=".45"/>
-    <ellipse cx="420" cy="127" rx="65" ry="18" fill="#a89060" opacity=".35"/>
-    <ellipse cx="415" cy="133" rx="12" ry="5" fill="#baa070" opacity=".35"/>
-
-    <!-- ══ LARGE CRATER — right side ══ -->
-    <ellipse cx="1180" cy="120" rx="90" ry="32" fill="#8a7040" opacity=".5"/>
-    <ellipse cx="1180" cy="116" rx="70" ry="22" fill="#9a8050" opacity=".4"/>
-    <ellipse cx="1180" cy="114" rx="48" ry="14" fill="#a89060" opacity=".3"/>
-
-    <!-- ══ MEDIUM CRATER — near horizon center ══ -->
-    <ellipse cx="850" cy="75" rx="65" ry="20" fill="#8a7040" opacity=".4"/>
-    <ellipse cx="850" cy="73" rx="48" ry="13" fill="#9a8050" opacity=".35"/>
-    <ellipse cx="850" cy="71" rx="30" ry="8" fill="#a89060" opacity=".25"/>
-
-    <!-- ══ MEDIUM CRATER — far left ══ -->
-    <ellipse cx="140" cy="210" rx="55" ry="22" fill="#8a7040" opacity=".45"/>
-    <ellipse cx="140" cy="207" rx="40" ry="15" fill="#9a8050" opacity=".35"/>
-    <ellipse cx="140" cy="205" rx="25" ry="9" fill="#a89060" opacity=".25"/>
-
-    <!-- ══ MEDIUM CRATER — far right ══ -->
-    <ellipse cx="1450" cy="155" rx="60" ry="22" fill="#8a7040" opacity=".45"/>
-    <ellipse cx="1450" cy="152" rx="44" ry="15" fill="#9a8050" opacity=".35"/>
-    <ellipse cx="1450" cy="150" rx="28" ry="9" fill="#a89060" opacity=".25"/>
-
-    <!-- ══ SMALL CRATERS (2 layers each) ══ -->
-    <ellipse cx="660" cy="88" rx="30" ry="11" fill="#8a7040" opacity=".38"/>
-    <ellipse cx="660" cy="86" rx="20" ry="7" fill="#a89060" opacity=".3"/>
-    <ellipse cx="1020" cy="82" rx="28" ry="10" fill="#8a7040" opacity=".35"/>
-    <ellipse cx="1020" cy="80" rx="18" ry="6" fill="#a89060" opacity=".28"/>
-    <ellipse cx="530" cy="105" rx="22" ry="9" fill="#8a7040" opacity=".32"/>
-    <ellipse cx="530" cy="103" rx="14" ry="5" fill="#a89060" opacity=".25"/>
-    <ellipse cx="300" cy="155" rx="25" ry="10" fill="#8a7040" opacity=".35"/>
-    <ellipse cx="300" cy="153" rx="16" ry="6" fill="#a89060" opacity=".28"/>
-    <ellipse cx="1320" cy="108" rx="24" ry="9" fill="#8a7040" opacity=".33"/>
-    <ellipse cx="1320" cy="106" rx="15" ry="5" fill="#a89060" opacity=".26"/>
-    <ellipse cx="580" cy="175" rx="28" ry="12" fill="#8a7040" opacity=".3"/>
-    <ellipse cx="960" cy="100" rx="20" ry="8" fill="#8a7040" opacity=".3"/>
-    <ellipse cx="1100" cy="165" rx="32" ry="13" fill="#8a7040" opacity=".33"/>
-
-    <!-- ══ TINY CRATERS ══ -->
-    <ellipse cx="220" cy="180" rx="10" ry="4" fill="#7a6432" opacity=".3"/>
-    <ellipse cx="480" cy="150" rx="12" ry="5" fill="#7a6432" opacity=".28"/>
-    <ellipse cx="720" cy="96" rx="9" ry="3.5" fill="#7a6432" opacity=".25"/>
-    <ellipse cx="900" cy="90" rx="11" ry="4" fill="#7a6432" opacity=".28"/>
-    <ellipse cx="1250" cy="145" rx="8" ry="3" fill="#7a6432" opacity=".22"/>
-    <ellipse cx="1530" cy="185" rx="9" ry="4" fill="#7a6432" opacity=".25"/>
-    <ellipse cx="80" cy="240" rx="11" ry="5" fill="#7a6432" opacity=".25"/>
-
-    <!-- ══ Surface ridges ══ -->
-    <path d="M50,240 Q400,170 800,138 Q1200,148 1560,210" stroke="#a89060" stroke-width=".7" fill="none" opacity=".12"/>
-    <path d="M30,280 Q400,215 800,185 Q1200,195 1580,250" stroke="#96783e" stroke-width=".6" fill="none" opacity=".1"/>
-  </svg>
-</div>
+<!-- Planet footer: Mars photo -->
+<div class="planet-footer" id="planet-footer"></div>
 
 <!-- ═════════════════════════════════════════════════════════════════════════
      FOOTER
@@ -1237,13 +1139,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (rocket.style.opacity !== '0') rocket.style.opacity = '0';
     }
 
-    // Planet footer: rises from bottom in last 25% of scroll
+    // Planet footer (Mars photo): rises from bottom in last 25% of scroll
+    // The circle is 140vw wide, centered. At plp=1 show top ~18% (25vh worth)
     if (planetFooter) {
       if (scrollRatio > 0.75) {
-        const plp = (scrollRatio - 0.75) * 4;
-        planetFooter.style.cssText = `opacity:${Math.min(plp/0.15,1)};transform:translateY(${100-plp*100}%)`;
+        const plp = (scrollRatio - 0.75) * 4; // 0→1
+        const rise = plp * 25; // max 25vh visible
+        const fade = Math.min(plp / 0.15, 1);
+        planetFooter.style.cssText = `opacity:${fade};transform:translateX(-50%) translateY(calc(100% - ${rise}vh))`;
       } else if (planetFooter.style.opacity !== '0') {
-        planetFooter.style.cssText = 'opacity:0;transform:translateY(100%)';
+        planetFooter.style.cssText = 'opacity:0;transform:translateX(-50%) translateY(100%)';
       }
     }
   };
