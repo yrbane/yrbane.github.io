@@ -331,6 +331,9 @@
   .featured-card.fc-cyan::before   { background: linear-gradient(90deg, var(--accent5), var(--accent2)); }
   .featured-card.fc-red::before    { background: linear-gradient(90deg, var(--accent3), var(--accent4)); }
   .featured-card.fc-green::before  { background: linear-gradient(90deg, var(--accent2), var(--accent5)); }
+  .featured-card.fc-blue::before   { background: linear-gradient(90deg, var(--accent5), var(--accent)); }
+
+  .fc-icon.fci-blue   { background: rgba(79,195,247,.12);  color: var(--accent5); }
 
   .fc-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -778,20 +781,22 @@
         </div>
       </a>
 
-      <!-- veilleur -->
-      <a href="https://github.com/yrbane/veilleur" class="featured-card fc-green">
+      <!-- LacheMoiLaGrappe -->
+      <a href="https://yrbane.github.io/LacheMoiLaGrappe/" class="featured-card fc-blue">
         <div class="fc-header">
-          <div class="fc-icon fci-green">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <div class="fc-icon fci-blue">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
-          <span class="fc-lang lang-ts"><span class="lang-dot"></span> TypeScript</span>
+          <span class="fc-lang lang-kt"><span class="lang-dot"></span> Kotlin</span>
         </div>
-        <div class="fc-title">Veilleur</div>
-        <div class="fc-desc">Agregateur d'actualites libre. Votre sentinelle de l'information, avec interface moderne en TypeScript.</div>
+        <div class="fc-title">LacheMoiLaGrappe</div>
+        <div class="fc-desc">Bouclier anti-d&eacute;marcheurs pour Android. Filtrage ARCEP, d&eacute;tection spam, allowlist/blocklist, SMS auto, widget, export CSV. Z&eacute;ro tracking.</div>
         <div class="fc-tags">
-          <span class="fc-tag">news</span>
-          <span class="fc-tag">agregateur</span>
-          <span class="fc-tag">libre</span>
+          <span class="fc-tag">Android</span>
+          <span class="fc-tag">Compose</span>
+          <span class="fc-tag">Material 3</span>
+          <span class="fc-tag">Room</span>
+          <span class="fc-tag">Hilt</span>
         </div>
         <div class="fc-bottom">
           <span class="fc-link">Voir le projet <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
@@ -815,12 +820,12 @@
 
     <div class="projects-grid">
 
-      <a href="https://github.com/yrbane/callfilter" class="project-card">
+      <a href="https://github.com/yrbane/veilleur" class="project-card">
         <div class="pc-header">
-          <span class="pc-name">callfilter</span>
-          <span class="pc-lang lang-kt"><span class="lang-dot"></span> Kotlin</span>
+          <span class="pc-name">veilleur</span>
+          <span class="pc-lang lang-ts"><span class="lang-dot"></span> TypeScript</span>
         </div>
-        <div class="pc-desc">App Android de filtrage intelligent des appels entrants.</div>
+        <div class="pc-desc">Agr&eacute;gateur d'actualit&eacute;s libre. Votre sentinelle de l'information.</div>
       </a>
 
       <a href="https://github.com/yrbane/debian13-web-server" class="project-card">
@@ -895,6 +900,7 @@
       <div class="tech-badge"><span class="tech-dot" style="background:#f1502f"></span> Git</div>
       <div class="tech-badge"><span class="tech-dot" style="background:#0db7ed"></span> Docker</div>
       <div class="tech-badge"><span class="tech-dot" style="background:#d63aff"></span> Linux</div>
+      <div class="tech-badge"><span class="tech-dot" style="background:#A97BFF"></span> Kotlin</div>
       <div class="tech-badge"><span class="tech-dot" style="background:#ff9800"></span> Android</div>
     </div>
   </div>
