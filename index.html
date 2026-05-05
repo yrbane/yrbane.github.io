@@ -14,14 +14,29 @@
   /* ═══════════════════════════════════════════════════════════════════════════
      CUSTOM VARIABLES (complément au framework Lunar Aurora)
      ═══════════════════════════════════════════════════════════════════════════ */
-  :root {
+  /* Override des variables Lunar Aurora en hex/rgb pour garantir le rendu
+     sur tous les navigateurs (sans oklch() ou avec un rendu défaillant).
+     Le triple :not(#\#) bat le hack de Lunar Aurora qui utilise
+     [data-theme=dark]:not(#\#):not(#\#) — on monte la spécificité d'un cran. */
+  :root:not(#\#):not(#\#):not(#\#) {
     --bg:      #06060b;
     --accent4: #ffd93d;
     --accent5: #4fc3f7;
 
-    /* Typographie : tout droit, monospace + sans géométrique */
+    /* Typographie */
     --font-sans:    "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --font-display: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Code", "Fira Code", monospace;
+
+    /* Surfaces & couleurs : valeurs hex équivalentes aux oklch d'origine */
+    --la-surface-1: #0a0e17;
+    --la-surface-2: #11161f;
+    --la-surface-3: #181d27;
+    --la-border:    #232a36;
+    --la-text:      #eceef2;
+    --la-text-muted:#7f838c;
+    --la-primary:   #6c63ff;
+    --la-secondary: #00d4aa;
+    --la-accent:    #ff6b6b;
   }
 
   html { scroll-behavior: auto; }
