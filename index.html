@@ -872,6 +872,15 @@
       animation: none;
     }
   }
+
+  /* captures d'écran : cartes phares et galerie de démos */
+  .fc-shot { width: 100%; display: block; border-radius: 10px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,.08); transition: transform .35s ease; }
+  .featured-card:hover .fc-shot { transform: scale(1.03) rotate(-.6deg); }
+  .demo-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; margin-top: 40px; }
+  .demo-tile { position: relative; display: block; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,.08); }
+  .demo-tile img { width: 100%; display: block; aspect-ratio: 16/10; object-fit: cover; object-position: top; transition: transform .35s ease; }
+  .demo-tile:hover img { transform: scale(1.07) rotate(-1deg); }
+  .demo-tile span { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 14px 10px; font-size: .85rem; background: linear-gradient(transparent, rgba(0,0,0,.88)); color: #fff; }
 </style>
 </head>
 <body>
@@ -894,6 +903,7 @@
     <ul>
       <li><a href="#projects">Projets</a></li>
       <li><a href="#more">Tous</a></li>
+      <li><a href="#demos">D&eacute;mos</a></li>
       <li><a href="#stack">Stack</a></li>
       <li><a href="https://github.com/yrbane">GitHub</a></li>
     </ul>
@@ -961,6 +971,7 @@
           </div>
           <span class="fc-lang lang-ts"><span class="lang-dot"></span> TypeScript</span>
         </div>
+        <img class="fc-shot" src="shots/youtubator.webp" alt="youtubator — deux platines YouTube en mix" loading="lazy">
         <div class="fc-title">youtubator</div>
         <div class="fc-desc">Table de mixage DJ dans le navigateur, dont les platines sont des players YouTube. Beatmatch automatique, EQ 3 bandes, boucles calees au beat, waveforms, MIDI, multi-comptes. Demo en ligne.</div>
         <div class="fc-tags">
@@ -982,6 +993,7 @@
           </div>
           <span class="fc-lang lang-rust"><span class="lang-dot"></span> Rust</span>
         </div>
+        <img class="fc-shot" src="shots/cp.webp" alt="documentation du clone cp en Rust" loading="lazy">
         <div class="fc-title">cp</div>
         <div class="fc-desc">Implementation moderne de GNU cp en Rust. Zero-copy I/O, copie parallele, sparse files, reflink, 30+ flags CLI, 137 tests.</div>
         <div class="fc-tags">
@@ -1160,6 +1172,52 @@
 <!-- ═════════════════════════════════════════════════════════════════════════
      TECH STACK
      ═════════════════════════════════════════════════════════════════════════ -->
+
+<!-- ============ DEMOS LIVE ============ -->
+<section id="demos">
+  <div class="container">
+    <div class="section-tag">Captures</div>
+    <h2 class="section-title"><em>D&eacute;mos</em> live</h2>
+    <p class="section-desc">
+      Cliquez, c'est du vrai : tout tourne dans le navigateur, rien &agrave; installer.
+    </p>
+    <div class="demo-gallery">
+      <a class="demo-tile" href="https://yrbane.github.io/youtubator/">
+        <img src="shots/youtubator.webp" alt="youtubator" loading="lazy">
+        <span>youtubator &mdash; mixe YouTube comme sur une vraie table 🎛️</span>
+      </a>
+      <a class="demo-tile" href="https://yrbane.github.io/potard/">
+        <img src="shots/potard.webp" alt="potard" loading="lazy">
+        <span>potard &mdash; tripote les knobs (docs interactives) 🎚️</span>
+      </a>
+      <a class="demo-tile" href="https://yrbane.github.io/geo3d/">
+        <img src="shots/geo3d.webp" alt="geo3d" loading="lazy">
+        <span>geo3d &mdash; hypnose filaire generative ✨</span>
+      </a>
+      <a class="demo-tile" href="https://yrbane.github.io/lunar-aurora/">
+        <img src="shots/lunar-aurora.webp" alt="lunar-aurora" loading="lazy">
+        <span>lunar-aurora &mdash; CSS d'avant-garde, 8 themes 🌘</span>
+      </a>
+      <a class="demo-tile" href="https://yrbane.github.io/cp/">
+        <img src="shots/cp.webp" alt="cp" loading="lazy">
+        <span>cp &mdash; docs du clone Rust zero-copy 🦀</span>
+      </a>
+      <a class="demo-tile" href="https://yrbane.github.io/photo-sort/">
+        <img src="shots/photo-sort.webp" alt="photo-sort" loading="lazy">
+        <span>photo-sort &mdash; galerie EXIF &amp; dedup BLAKE3 📷</span>
+      </a>
+      <a class="demo-tile" href="https://yrbane.github.io/debian13-admin/">
+        <img src="shots/debian13-admin.webp" alt="debian13-admin" loading="lazy">
+        <span>debian13-admin &mdash; hardening sans peur 🛡️</span>
+      </a>
+      <a class="demo-tile" href="https://yrbane.github.io/LacheMoiLaGrappe/">
+        <img src="shots/lachemoilagrappe.webp" alt="LacheMoiLaGrappe" loading="lazy">
+        <span>LacheMoiLaGrappe &mdash; lache-moi la grappe, les demarcheurs 🍇</span>
+      </a>
+    </div>
+  </div>
+</section>
+
 <section id="stack">
   <div class="container" style="text-align: center;">
     <div class="section-tag" style="justify-content: center;">Stack</div>
