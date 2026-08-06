@@ -963,6 +963,50 @@
 
     <div class="featured-grid">
 
+      <!-- Oscillo -->
+      <a href="https://github.com/yrbane/oscillo" class="featured-card fc-cyan">
+        <div class="fc-header">
+          <div class="fc-icon fci-cyan">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <span class="fc-lang lang-rust"><span class="lang-dot"></span> Rust</span>
+        </div>
+        <img class="fc-shot" src="shots/oscillo.webp" alt="Oscillo — oscilloscope audio stéréo temps réel, formes d'onde et figures de Lissajous" loading="lazy">
+        <div class="fc-title">Oscillo</div>
+        <div class="fc-desc">Oscilloscope audio stéréo temps réel — l'esprit du Mordax DATA sur ton bureau. Capture cpal (WASAPI/CoreAudio/ALSA), rendu egui à 60 FPS, ring buffer lock-free entre le callback audio et l'UI : zéro allocation dans le chemin chaud. Modes Overlay/Split/XY avec figures de Lissajous, trigger digne d'un vrai scope (niveau, front, single-shot), gain et offset par canal, config persistante. Branche deux oscillateurs, passe en XY, et regarde la quinte se dessiner. 〰️</div>
+        <div class="fc-tags">
+          <span class="fc-tag">audio</span>
+          <span class="fc-tag">DSP</span>
+          <span class="fc-tag">egui</span>
+          <span class="fc-tag">temps réel</span>
+        </div>
+        <div class="fc-bottom">
+          <span class="fc-link">Voir le projet <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </div>
+      </a>
+
+      <!-- SysWall -->
+      <a href="https://github.com/yrbane/SysWall" class="featured-card fc-red">
+        <div class="fc-header">
+          <div class="fc-icon fci-red">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <span class="fc-lang lang-rust"><span class="lang-dot"></span> Rust</span>
+        </div>
+        <img class="fc-shot" src="shots/syswall.webp" alt="SysWall — pare-feu applicatif Linux, popup de décision par connexion" loading="lazy">
+        <div class="fc-title">SysWall</div>
+        <div class="fc-desc">Pare-feu applicatif pour Linux — l'expérience Little Snitch, native et open source. Intercepte chaque nouvelle connexion (nftables + NFQUEUE), l'attribue au processus via eBPF, et te propose d'autoriser / bloquer / créer une règle depuis une app Tauri. Moniteur de connexions en direct, journal d'audit, mode apprentissage, kill-switch anti-lockout. Architecture hexagonale Rust, gRPC sur socket Unix durci, unit systemd sandboxé.</div>
+        <div class="fc-tags">
+          <span class="fc-tag">nftables</span>
+          <span class="fc-tag">eBPF</span>
+          <span class="fc-tag">Tauri</span>
+          <span class="fc-tag">firewall</span>
+        </div>
+        <div class="fc-bottom">
+          <span class="fc-link">Voir le projet <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </div>
+      </a>
+
       <!-- minoupix -->
       <a href="https://minoupix.com" class="featured-card fc-purple">
         <div class="fc-header">
